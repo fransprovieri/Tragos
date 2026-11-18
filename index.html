@@ -257,7 +257,7 @@ const frames = id => [0,1,2,3].map(k=>`<img class="frame" data-k="${k}" src="ass
 /* ---- navegación entre bares (deslizar) ---- */
 let cur = 0;
 try{ const s = parseInt(localStorage.getItem('tragos.bar2')); if(s>=0 && s<BARS.length) cur = s; }catch(e){}
-function paintBar(){ for(const el of [document.body,$('#results'),$('#detail')]) el.dataset.bar = BARS[cur].id; }
+function paintBar(){ for(const el of [document.body,$('#results'),$('#detail')]) el.dataset.bar = BARS[cur].id; const bg=getComputedStyle(document.body).getPropertyValue('--bgc').trim(); if(bg){ document.documentElement.style.background=bg; document.querySelector('.app').style.background=bg; } }
 function setActive(i){
   if(i===cur && document.querySelector('#dots .on')) return;
   cur = i; paintBar();
@@ -447,6 +447,14 @@ paintBar();
 render();
 requestAnimationFrame(()=>goTo(cur, false));
 if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }catch(e){} }
+
+/* ---- que la app tape toda la pantalla (iOS a veces mide de menos y deja una franja negra) ---- */
+function fitApp(){
+  const st = navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+  const h = st ? Math.max(innerHeight, screen.height) : innerHeight;
+  document.querySelector('.app').style.height = h+'px';
+}
+fitApp(); addEventListener('resize', fitApp); addEventListener('orientationchange', ()=>setTimeout(fitApp,300)); addEventListener('pageshow', fitApp);
 </script>
 </body>
 </html>
