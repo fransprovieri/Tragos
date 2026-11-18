@@ -143,14 +143,16 @@ body.clasico-d .dscroll h3{color:#F0B046}
 .ed textarea{min-height:120px;resize:none;border:1.5px dashed rgba(var(--fgrgb),.4);padding:9px;line-height:1.4}
 
 /* ---------- despensa ---------- */
-.mk-chips{position:absolute;left:0;right:0;top:calc(var(--top) + 52px);z-index:6;display:flex;gap:5px;padding:0 38px 0 22px;white-space:nowrap}
-.mk-chips button{height:30px;padding:0 9px;border:1.8px solid rgba(var(--fgrgb),.5);border-radius:999px;display:flex;align-items:center;background:transparent;font-family:var(--ruina);font-size:10px;letter-spacing:.5px;color:var(--fg);cursor:pointer;text-transform:uppercase}
+.mk-chips{position:absolute;left:0;right:0;top:calc(var(--top) + 52px);z-index:6;display:flex;gap:4px;padding:0;left:44px;right:44px;white-space:nowrap}
+.mk-chips button{height:30px;padding:0 8px;border:1.8px solid rgba(var(--fgrgb),.5);border-radius:999px;display:flex;align-items:center;background:transparent;font-family:var(--ruina);font-size:10px;letter-spacing:.5px;color:var(--fg);cursor:pointer;text-transform:uppercase}
 .mk-chips button.on{background:var(--fg);color:var(--bgc);border-color:var(--fg)}
 .mk-chips button i{font-style:normal;margin-left:5px;opacity:.7}
-.mk-chips button.pb{margin-left:auto;width:34px;padding:0;justify-content:center}
+.mk-chips button.pb{margin-left:auto;flex:none;width:34px;padding:0;justify-content:center}
 .mk-chips button.pb svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.bar[data-bar="mi"] .scroll{padding-top:calc(var(--top) + 108px)}
+.bar .scroll{padding-top:calc(var(--top) + 108px)}
 .mk-badge{position:absolute;top:2px;left:6px;height:22px;padding:0 9px;border-radius:999px;font-family:var(--ruina);font-size:11px;letter-spacing:.6px;display:flex;align-items:center;gap:4px;color:#fff;z-index:3}
+.mk-badge:not(.ok):not(.near){background:rgba(var(--fgrgb),.6)}
+.mk-chips button[data-ps].on:before{content:"↓ ";margin-right:4px}
 .mk-badge.ok{background:#3E9A4A}.mk-badge.near{background:#D58A1C}
 .row .mk-badge{position:static;display:inline-flex;height:17px;padding:0 7px;font-size:10px;margin-left:8px;vertical-align:2px}
 .mk-sec{grid-column:1/-1;font-family:var(--ruina);font-size:12px;letter-spacing:1px;color:var(--accent);margin:2px 0 -6px}
@@ -290,20 +292,25 @@ const missLbl=x=>x.map(i=>LBL[i]).join(' / ');
 function badge(d){
   if(!pantry.length) return '';
   const s=status(d); if(!s.total) return '';
+  if(ps&&s.miss.length>1) return `<span class="mk-badge">${s.have}/${s.total}</span>`;
   if(!s.miss.length) return `<span class="mk-badge ok">✓ ${s.have}/${s.total}</span>`;
   if(s.miss.length===1) return `<span class="mk-badge near">${s.have}/${s.total}</span>`;
   return '';
 }
-let mf='fav'; try{ const v=localStorage.getItem('tragos.mf'); if(['fav','mine','can'].includes(v)) mf=v; }catch(e){}
+let mf='fav'; try{ const v=localStorage.getItem('tragos.mf'); if(['fav','mine'].includes(v)) mf=v; }catch(e){}
+let ps=false; try{ ps=localStorage.getItem('tragos.ps')==='1'; }catch(e){}
+const pct=d=>{ const s=status(d); return s.total?s.have/s.total:0; };
+const byPct=l=>(ps&&pantry.length)?[...l].sort((a,b)=>pct(b)-pct(a)):l;
 function canLists(){
   const ready=[],near=[];
   DRINKS.forEach(d=>{ const s=status(d); if(!s.total) return; if(!s.miss.length) ready.push(d); else if(s.miss.length===1) near.push(d); });
   return {ready,near};
 }
 const PANBTN='<svg viewBox="0 0 24 24"><path d="M7 3h10v3H7zM6 6h12l1 4v9a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-9z"/><path d="M5.5 12h13"/></svg>';
-function miChips(){
+function miChips(id){
   const n=pantry.length?canLists().ready.length:0;
-  return `<div class="mk-chips"><button data-mf="fav" class="${mf==='fav'?'on':''}">Favoritos</button><button data-mf="mine" class="${mf==='mine'?'on':''}">Mis recetas</button><button data-mf="can" class="${mf==='can'?'on':''}">Puedo hacer${n?`<i>${n}</i>`:''}</button><button class="pb" data-openpantry aria-label="Mi despensa">${PANBTN}</button></div>`;
+  const m=id==='mi'?`<button data-mf="fav" class="${mf==='fav'?'on':''}">Favoritos</button><button data-mf="mine" class="${mf==='mine'?'on':''}">Mis recetas</button>`:'';
+  return `<div class="mk-chips">${m}<button data-ps class="${ps?'on':''}">Puedo hacer${n?`<i>${n}</i>`:''}</button><button class="pb" data-openpantry aria-label="Mi despensa">${PANBTN}</button></div>`;
 }
 const tile = d => `<div class="tile" role="button" tabindex="0" data-id="${d.id}">${pic(d,'pic')}${badge(d)}<div class="${nmCls(d)}">${d.name}</div>${favBtn(d.id)}</div>`;
 const row  = d => `<div class="row" role="button" tabindex="0" data-id="${d.id}">${pic(d,'th')}<div class="tx"><b>${d.name}${badge(d)}</b><small>${sub(d)}</small></div>${favBtn(d.id)}</div>`;
@@ -320,25 +327,16 @@ function secList(parts){
 }
 const emptyMsg=(t,m,btn)=>`<div class="empty"><b>${t}</b>${m}${btn?'<br><button class="mk-btn" data-openpantry>ARMAR MI DESPENSA</button>':''}</div>`;
 function barContent(id){
-  if(id==='mi'){
-    if(mf==='mine'){ const l=DRINKS.filter(d=>d.custom); return l.length?listHtml(l):emptyMsg('Sin recetas propias','Abrí cualquier trago y tocá “+ Mi versión” para crear la tuya.'); }
-    if(mf==='can'){
-      if(!pantry.length) return emptyMsg('Tu despensa está vacía','Marcá lo que tenés en casa y te muestro qué tragos podés preparar.',true);
-      const {ready,near}=canLists();
-      if(!ready.length&&!near.length) return emptyMsg('Todavía no alcanza','Con lo que tenés no llegás a ningún trago. Sumá ingredientes a tu despensa.',true);
-      const parts=[]; if(ready.length) parts.push('LISTOS PARA PREPARAR',...ready); if(near.length) parts.push('CASI · TE FALTA 1',...near);
-      return secList(parts);
-    }
-  }
+  if(id==='mi' && mf==='mine'){ const l=DRINKS.filter(d=>d.custom); return l.length?listHtml(byPct(l)):emptyMsg('Sin recetas propias','Abrí cualquier trago y tocá “+ Mi versión” para crear la tuya.'); }
   const l = barDrinks(id);
   if(!l.length) return `<div class="empty"><b>Tu bar está vacío</b>Tocá el corazón de cualquier trago y queda guardado acá.<small>Deslizá para ver los otros bares →</small></div>`;
-  return listHtml(l);
+  return listHtml(byPct(l));
 }
 function render(){
   const keep = [...document.querySelectorAll('.scroll')].map(s=>s.scrollTop);
   $('#pager').innerHTML = BARS.map(b => `
     <section class="bar" data-bar="${b.id}">
-      <div class="scroll">${barContent(b.id)}</div>${b.id==='mi'?miChips():''}
+      <div class="scroll">${barContent(b.id)}</div>${miChips(b.id)}
       <div class="grain"></div>${frames(b.id)}
     </section>`).join('');
   document.querySelectorAll('.scroll').forEach((s,i)=>s.scrollTop = keep[i]||0);
@@ -497,6 +495,7 @@ function delCustom(id){
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeSheet(); if((e.key==='Enter'||e.key===' ') && (e.target.classList?.contains('tile')||e.target.classList?.contains('row'))){ e.preventDefault(); openSheet(e.target.dataset.id, e.target);} });
 
 document.addEventListener('click', e=>{
+  if(e.target.closest('[data-ps]')){ if(!pantry.length){ openPantry(); return; } ps=!ps; try{ localStorage.setItem('tragos.ps',ps?'1':'0'); }catch(e){} render(); goTo(cur,false); return; }
   const mfb=e.target.closest('[data-mf]');
   if(mfb){ mf=mfb.dataset.mf; try{ localStorage.setItem('tragos.mf',mf); }catch(e){} render(); goTo(cur,false); return; }
   if(e.target.closest('[data-openpantry]')){ openPantry(); return; }
