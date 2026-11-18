@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tragos</title>
+<meta name="theme-color" content="#14110f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tragos">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--bg:#14110f;--card:#1f1a17;--card2:#2a231f;--ink:#f3ece4;--mute:#a69888;--amber:#e7a33e;--tiki:#3fb58a;--line:#3a312b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif}
+header{position:sticky;top:0;z-index:5;background:rgba(20,17,15,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:calc(env(safe-area-inset-top) + 10px) 16px 10px;border-bottom:1px solid var(--line)}
+h1{margin:0 0 10px;font:700 28px/1.1 ui-serif,Georgia,serif;letter-spacing:.3px}
+h1 span{color:var(--amber)}
+#q{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:16px;outline:none}
+#q:focus{border-color:var(--amber)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--mute);font-size:14px}
+.chip.on{background:var(--amber);border-color:var(--amber);color:#1a1300;font-weight:600}
+main{padding:12px 16px calc(90px + env(safe-area-inset-bottom))}
+.sec{margin:18px 0 8px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mute)}
+.list{display:grid;gap:8px;grid-template-columns:minmax(0,1fr)}
+.row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--card);border-radius:14px;border:1px solid transparent;cursor:pointer}
+.row:active{background:var(--card2)}
+.row img{width:44px;height:44px;border-radius:10px;object-fit:cover;flex:none}
+.dot{width:10px;height:10px;border-radius:50%;flex:none;background:var(--amber)}
+.dot.tiki{background:var(--tiki)}
+.row .t{flex:1;min-width:0}
+.row .n{font-weight:600}
+.row .s{color:var(--mute);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.star{background:none;border:0;font-size:22px;color:#6b5d52;padding:4px 6px;line-height:1}
+.star.on{color:var(--amber)}
+.empty{color:var(--mute);text-align:center;padding:40px 10px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:rgba(20,17,15,.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:6}
+nav button{flex:1;background:none;border:0;color:var(--mute);padding:10px 0 8px;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button b{font-size:20px;font-weight:400}
+nav button.on{color:var(--amber)}
+/* detalle */
+#detail{position:fixed;inset:0;background:var(--bg);z-index:10;overflow-y:auto;transform:translateY(100%);transition:transform .25s ease;padding:calc(env(safe-area-inset-top) + 8px) 18px calc(30px + env(safe-area-inset-bottom))}
+#detail.open{transform:none}
+.dtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.back{background:none;border:0;color:var(--amber);font-size:17px;padding:8px 0}
+#detail h2{font:700 32px/1.1 ui-serif,Georgia,serif;margin:6px 0 4px}
+.meta{color:var(--mute);font-size:14px;margin-bottom:14px}
+.tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600;margin-right:6px;background:var(--amber);color:#1a1300}
+.tag.tiki{background:var(--tiki);color:#04140e}
+.hero{width:100%;border-radius:16px;margin:6px 0 12px;aspect-ratio:1;object-fit:cover}
+.ctrl{display:flex;gap:10px;align-items:center;margin:8px 0 14px;flex-wrap:wrap}
+.step{display:flex;align-items:center;background:var(--card);border-radius:12px;border:1px solid var(--line)}
+.step button{background:none;border:0;color:var(--ink);font-size:20px;width:40px;height:38px}
+.step span{min-width:62px;text-align:center;font-size:14px}
+.seg{display:flex;background:var(--card);border-radius:12px;border:1px solid var(--line);overflow:hidden}
+.seg button{background:none;border:0;color:var(--mute);padding:9px 14px;font-size:14px}
+.seg button.on{background:var(--card2);color:var(--ink);font-weight:600}
+table{width:100%;border-collapse:collapse;margin-bottom:16px}
+td{padding:9px 0;border-bottom:1px solid var(--line);vertical-align:top}
+td.q{width:96px;color:var(--amber);font-weight:600;white-space:nowrap;padding-right:10px}
+.box{background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px}
+.box h3{margin:0 0 6px;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--mute);font-weight:600}
+.note{color:var(--mute);font-size:13px;text-align:center;margin-top:8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Tra<span>gos</span></h1>
+  <input id="q" type="search" placeholder="Buscar trago o ingrediente…" autocomplete="off">
+  <div class="chips" id="chips"></div>
+</header>
+<main id="main"></main>
+<nav id="nav">
+  <button data-tab="clasico" class="on"><b>🥃</b>Clásicos</button>
+  <button data-tab="tiki"><b>🌺</b>Tiki</button>
+  <button data-tab="favs"><b>★</b>Favoritos</button>
+  <button data-tab="catalogo"><b>🔎</b>Catálogo</button>
+</nav>
+<section id="detail" aria-hidden="true"></section>
+
+<script src="data.js"></script>
+<script>
+const API = "https://www.thecocktaildb.com/api/json/v1/1/";
+const store = {
+  get(k, d){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+};
+let favs = new Set(store.get("tragos.favs", []));
+let extra = store.get("tragos.extra", {});   // tragos del catálogo guardados como favoritos
+let unit = store.get("tragos.unit", "ml");
+let tab = "clasico", base = "Todos", query = "", serv = 1, current = null;
+let catalog = [], catTimer = null, catSeq = 0;
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm = s => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+
+function saveFavs(){ store.set("tragos.favs", [...favs]); store.set("tragos.extra", extra); }
+function byId(id){ return RECIPES.find(r => r.id === id) || extra[id] || catalog.find(r => r.id === id); }
+function toggleFav(id){
+  if (favs.has(id)) { favs.delete(id); delete extra[id]; }
+  else { favs.add(id); const r = byId(id); if (r && r.cat === "catalogo") extra[id] = r; }
+  saveFavs();
+}
+
+// ---------- cantidades ----------
+function fmtOz(oz){
+  const whole = Math.floor(oz + 1e-9), frac = oz - whole;
+  const fr = [[0,""],[.25,"¼"],[1/3,"⅓"],[.5,"½"],[2/3,"⅔"],[.75,"¾"],[1,""]];
+  let best = fr[0]; for (const f of fr) if (Math.abs(frac - f[0]) < Math.abs(frac - best[0])) best = f;
+  const w = best[0] === 1 ? whole + 1 : whole;
+  return ((w ? w : "") + (best[1] ? (w ? " " : "") + best[1] : "") || "0") + " oz";
+}
+function fmtNum(n){ return (Math.round(n * 10) / 10).toString().replace(".", ","); }
+function qty(i){
+  const [q, u] = i; if (q == null) return "";
+  const n = q * serv;
+  if (u === "ml") return unit === "oz" ? fmtOz(n / 30) : fmtNum(n) + " ml";
+  if (u === "dash") return fmtNum(n) + (n === 1 ? " dash" : " dashes");
+  if (u === "gotas") return fmtNum(n) + " gotas";
+  if (u === "bs") return fmtNum(n) + " bar spoon";
+  if (u === "u") return fmtNum(n);
+  return fmtNum(n);
+}
+
+// ---------- listas ----------
+function pool(){
+  if (tab === "favs") return [...favs].map(byId).filter(Boolean);
+  return RECIPES.filter(r => r.cat === tab);
+}
+function matches(r){
+  if (base !== "Todos" && r.base !== base) return false;
+  if (!query) return true;
+  const q = norm(query);
+  return norm(r.name).includes(q) || r.ing.some(i => norm(i[2]).includes(q));
+}
+function rowHTML(r){
+  const sub = r.cat === "catalogo" ? (r.base || "Catálogo") : r.ing.filter(i => i[1] === "ml").slice(0,3).map(i => i[2].replace(/ \(.*\)/, "")).join(" · ");
+  const ico = r.img ? `<img src="${esc(r.img)}/small" alt="" loading="lazy">` : `<span class="dot ${r.cat === "tiki" ? "tiki" : ""}"></span>`;
+  return `<div class="row" data-id="${esc(r.id)}">${ico}<div class="t"><div class="n">${esc(r.name)}</div><div class="s">${esc(sub)}</div></div>
+    <button class="star ${favs.has(r.id) ? "on" : ""}" data-star="${esc(r.id)}" aria-label="Favorito">${favs.has(r.id) ? "★" : "☆"}</button></div>`;
+}
+function renderChips(){
+  const el = $("#chips");
+  if (tab === "catalogo") { el.innerHTML = ""; el.style.display = "none"; return; }
+  el.style.display = "";
+  const bases = ["Todos", ...new Set(pool().map(r => r.base).filter(Boolean))];
+  if (!bases.includes(base)) base = "Todos";
+  el.innerHTML = bases.map(b => `<button class="chip ${b === base ? "on" : ""}" data-base="${esc(b)}">${esc(b)}</button>`).join("");
+}
+function render(){
+  renderChips();
+  const m = $("#main");
+  if (tab === "catalogo") return renderCatalog();
+  const list = pool().filter(matches).sort((a,b) => a.name.localeCompare(b.name));
+  if (!list.length) {
+    m.innerHTML = `<div class="empty">${tab === "favs" && !favs.size ? "Todavía no marcaste favoritos.<br>Tocá ☆ en cualquier trago para guardarlo acá." : "No encontré nada con eso."}</div>`;
+    return;
+  }
+  m.innerHTML = `<div class="sec">${list.length} tragos</div><div class="list">${list.map(rowHTML).join("")}</div>`;
+}
+
+// ---------- catálogo (TheCocktailDB) ----------
+function fromAPI(d){
+  const ing = [];
+  for (let k = 1; k <= 15; k++) {
+    const n = d["strIngredient" + k]; if (!n || !n.trim()) continue;
+    ing.push([null, "", n.trim(), (d["strMeasure" + k] || "").trim()]);
+  }
+  return { id: "cdb-" + d.idDrink, name: d.strDrink, cat: "catalogo", base: d.strCategory || "", glass: d.strGlass || "",
+    method: d.strAlcoholic || "", ing, garnish: "", steps: d.strInstructionsES || d.strInstructions || "", img: d.strDrinkThumb };
+}
+async function searchCatalog(q){
+  const seq = ++catSeq, m = $("#main");
+  m.innerHTML = `<div class="empty">Buscando…</div>`;
+  try {
+    const url = q.length === 1 ? API + "search.php?f=" + encodeURIComponent(q) : API + "search.php?s=" + encodeURIComponent(q);
+    const j = await (await fetch(url)).json();
+    if (seq !== catSeq) return;
+    catalog = (j.drinks || []).map(fromAPI);
+    renderCatalog();
+  } catch (e) {
+    if (seq !== catSeq) return;
+    m.innerHTML = `<div class="empty">No pude conectar con el catálogo.<br>Revisá la conexión a internet.</div>`;
+  }
+}
+function renderCatalog(){
+  const m = $("#main");
+  if (!query) { m.innerHTML = `<div class="empty">Buscá cualquier trago por nombre<br>(más de 600 en TheCocktailDB).<br><br>Tip: una sola letra lista todos los que empiezan con ella.</div>`; return; }
+  if (!catalog.length) { m.innerHTML = `<div class="empty">Sin resultados para “${esc(query)}”.</div>`; return; }
+  m.innerHTML = `<div class="sec">${catalog.length} resultados · TheCocktailDB</div><div class="list">${catalog.map(rowHTML).join("")}</div>`;
+}
+
+// ---------- detalle ----------
+function openDetail(id){
+  current = byId(id); if (!current) return; serv = 1;
+  renderDetail(); const d = $("#detail"); d.classList.add("open"); d.setAttribute("aria-hidden","false"); d.scrollTop = 0;
+  history.pushState({ d: 1 }, "");
+}
+function closeDetail(){ $("#detail").classList.remove("open"); $("#detail").setAttribute("aria-hidden","true"); current = null; render(); }
+function renderDetail(){
+  const r = current, isCat = r.cat === "catalogo", on = favs.has(r.id);
+  const tag = isCat ? `<span class="tag" style="background:#6b7cff;color:#fff">Catálogo</span>` : `<span class="tag ${r.cat === "tiki" ? "tiki" : ""}">${r.cat === "tiki" ? "Tiki" : "Clásico"}</span>`;
+  const rows = r.ing.map(i => `<tr><td class="q">${esc(isCat ? i[3] : qty(i))}</td><td>${esc(i[2])}</td></tr>`).join("");
+  $("#detail").innerHTML = `
+    <div class="dtop"><button class="back" id="back">‹ Volver</button>
+      <button class="star ${on ? "on" : ""}" id="dstar" style="font-size:28px">${on ? "★" : "☆"}</button></div>
+    ${r.img ? `<img class="hero" src="${esc(r.img)}" alt="">` : ""}
+    <h2>${esc(r.name)}</h2>
+    <div class="meta">${tag}${esc([r.base, r.glass].filter(Boolean).join(" · "))}</div>
+    ${isCat ? "" : `<div class="ctrl">
+      <div class="step"><button id="minus">−</button><span>${serv} ${serv === 1 ? "trago" : "tragos"}</span><button id="plus">+</button></div>
+      <div class="seg"><button data-u="ml" class="${unit === "ml" ? "on" : ""}">ml</button><button data-u="oz" class="${unit === "oz" ? "on" : ""}">oz</button></div>
+    </div>`}
+    <table>${rows}</table>
+    ${r.method ? `<div class="box"><h3>Método</h3>${esc(r.method)}</div>` : ""}
+    <div class="box"><h3>Preparación</h3>${esc(r.steps)}</div>
+    ${r.garnish && r.garnish !== "—" ? `<div class="box"><h3>Garnish</h3>${esc(r.garnish)}</div>` : ""}
+    ${isCat ? `<div class="note">Receta de TheCocktailDB. Si la marcás como favorita queda guardada en el teléfono.</div>` : ""}`;
+}
+
+// ---------- eventos ----------
+$("#nav").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  tab = b.dataset.tab; base = "Todos";
+  document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x === b));
+  $("#q").placeholder = tab === "catalogo" ? "Buscar en el catálogo completo…" : "Buscar trago o ingrediente…";
+  if (tab === "catalogo" && query) searchCatalog(query); else render();
+  window.scrollTo(0, 0);
+});
+$("#q").addEventListener("input", e => {
+  query = e.target.value.trim();
+  if (tab === "catalogo") { clearTimeout(catTimer); if (!query) { catalog = []; renderCatalog(); } else catTimer = setTimeout(() => searchCatalog(query), 350); }
+  else render();
+});
+$("#chips").addEventListener("click", e => { const b = e.target.closest("[data-base]"); if (b) { base = b.dataset.base; render(); } });
+$("#main").addEventListener("click", e => {
+  const s = e.target.closest("[data-star]");
+  if (s) { toggleFav(s.dataset.star); tab === "catalogo" ? renderCatalog() : render(); return; }
+  const r = e.target.closest(".row"); if (r) openDetail(r.dataset.id);
+});
+$("#detail").addEventListener("click", e => {
+  const t = e.target;
+  if (t.id === "back") { history.back(); return; }
+  if (t.id === "dstar") { toggleFav(current.id); renderDetail(); return; }
+  if (t.id === "plus") { serv = Math.min(serv + 1, 20); renderDetail(); return; }
+  if (t.id === "minus") { serv = Math.max(serv - 1, 1); renderDetail(); return; }
+  if (t.dataset.u) { unit = t.dataset.u; store.set("tragos.unit", unit); renderDetail(); }
+});
+window.addEventListener("popstate", () => { if (current) closeDetail(); });
+
+render();
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
