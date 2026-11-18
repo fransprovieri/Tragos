@@ -1,4 +1,4 @@
-const C='tragos-v5';
+const C='tragos-v6';
 const FILES=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-180.png','./assets/Ruina.ttf',
  ...['mi','tiki','clasico'].map(b=>`./assets/marco/${b}.webp`),
  ...['old-fashioned','mai-tai','pina-colada','painkiller','jungle-bird','daiquiri','negroni'].map(d=>`./assets/drinks/${d}.webp`)];

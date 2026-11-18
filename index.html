@@ -21,9 +21,9 @@
   --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 /* un color liso por bar; el marco ilustrado va encima como PNG */
-[data-bar="mi"]{--bgc:#E6D9BC;--fg:#2E1622;--fgrgb:46,22,34;--fade:81dvh}
-[data-bar="tiki"]{--bgc:#F3D9A4;--fg:#2E1622;--fgrgb:46,22,34;--fade:83.5dvh}
-[data-bar="clasico"]{--bgc:#4E2230;--fg:#FCF2DE;--fgrgb:252,242,222;--fade:80dvh}
+[data-bar="mi"]{--bgc:#E6D9BC;--fg:#2E1622;--fgrgb:46,22,34;--fade:81dvh;--top:9dvh;--dtop:11dvh}
+[data-bar="tiki"]{--bgc:#F3D9A4;--fg:#2E1622;--fgrgb:46,22,34;--fade:83.5dvh;--top:15.6dvh;--dtop:17dvh}
+[data-bar="clasico"]{--bgc:#4E2230;--fg:#FCF2DE;--fgrgb:252,242,222;--fade:80dvh;--top:9.5dvh;--dtop:11dvh}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;background:#120b0e;font-family:var(--serif)}
 body{display:flex;justify-content:center}
@@ -31,7 +31,7 @@ body{display:flex;justify-content:center}
 button{font:inherit;color:inherit}
 
 /* ---------- buscador integrado + puntitos ---------- */
-.topbar{position:absolute;z-index:7;left:44px;right:44px;top:17.3dvh;display:flex;gap:8px}
+.topbar{position:absolute;z-index:7;left:44px;right:44px;top:var(--top);display:flex;gap:8px;transition:top .25s}
 .search{flex:1;min-width:0;height:40px;display:flex;align-items:center;gap:8px;background:rgba(var(--fgrgb),.14);border-radius:999px;padding:0 6px 0 14px;transition:background .25s}
 .search>svg{flex:none;opacity:.8;stroke:var(--fg)}
 .search input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:16px;color:var(--fg);outline:none;height:100%}
@@ -56,10 +56,12 @@ body[data-view="cards"] .vt .a svg{fill:var(--bgc);stroke:none}body[data-view="l
 .pager::-webkit-scrollbar{display:none}
 .bar{flex:0 0 100%;position:relative;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:var(--bgc) var(--grain);color:var(--fg)}
 .frame{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;z-index:3}
-.scroll{position:absolute;inset:0;z-index:2;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
-  padding:24.4dvh clamp(40px,11.3vw,56px) 24dvh;
-  -webkit-mask-image:linear-gradient(to bottom,transparent 0,transparent 21.2dvh,#000 23.6dvh,#000 calc(var(--fade) - 3dvh),transparent var(--fade));
-          mask-image:linear-gradient(to bottom,transparent 0,transparent 21.2dvh,#000 23.6dvh,#000 calc(var(--fade) - 3dvh),transparent var(--fade))}
+.scroll{position:absolute;inset:0;z-index:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  padding:calc(var(--top) + 62px) clamp(40px,11.3vw,56px) 24dvh}
+/* tapas con degradé (más livianas que una máscara): tapan la lista bajo el buscador y sobre la decoración de abajo */
+.bar::before,.results::before{content:"";position:absolute;left:0;right:0;top:0;height:calc(var(--top) + 44px + 3.5dvh);z-index:2;pointer-events:none;background:var(--grain),linear-gradient(to bottom,var(--bgc) calc(var(--top) + 44px),transparent)}
+.detail::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--dtop);z-index:2;pointer-events:none;background:var(--grain),linear-gradient(to bottom,var(--bgc) calc(var(--dtop) - 3.5dvh),transparent)}
+.bar::after,.results::after,.detail::after{content:"";position:absolute;left:0;right:0;top:calc(var(--fade) - 3.5dvh);bottom:0;z-index:2;pointer-events:none;background:var(--grain),linear-gradient(to bottom,transparent,var(--bgc) 3.5dvh)}
 
 /* tragos directo sobre el fondo, sin tarjetas */
 .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:16px;row-gap:26px}
@@ -88,19 +90,16 @@ body[data-view="cards"] .vt .a svg{fill:var(--bgc);stroke:none}body[data-view="l
 /* ---------- resultados de búsqueda (todos los tragos) ---------- */
 .results{position:absolute;inset:0;z-index:5;display:none;background:var(--bgc) var(--grain);color:var(--fg)}
 .results.show{display:block}
-.results .inner{position:absolute;inset:0;z-index:2;overflow-y:auto;overscroll-behavior:contain;padding:24.4dvh clamp(40px,11.3vw,56px) 24dvh;
-  -webkit-mask-image:linear-gradient(to bottom,transparent 0,transparent 21.2dvh,#000 23.6dvh,#000 calc(var(--fade) - 3dvh),transparent var(--fade));
-          mask-image:linear-gradient(to bottom,transparent 0,transparent 21.2dvh,#000 23.6dvh,#000 calc(var(--fade) - 3dvh),transparent var(--fade))}
+.results .inner{position:absolute;inset:0;z-index:1;overflow-y:auto;overscroll-behavior:contain;padding:calc(var(--top) + 62px) clamp(40px,11.3vw,56px) 24dvh}
 .results .count{margin:0 0 12px;font-size:12.5px;font-weight:700;color:rgba(var(--fgrgb),.62);letter-spacing:.4px}
 .none{text-align:center;color:rgba(var(--fgrgb),.62);margin-top:30px}
 
 /* ---------- vista del trago: el trago "se acerca" y la receta queda como hoja ---------- */
 .detail{position:absolute;inset:0;z-index:20;display:none;background:var(--bgc) var(--grain);color:var(--fg)}
 .detail.show{display:block}
-.dscroll{position:absolute;z-index:2;left:0;right:0;top:15.6dvh;bottom:8dvh;overflow-y:auto;overscroll-behavior:contain;padding:8px clamp(40px,11.3vw,56px) 40px;
-  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 12px,#000 calc(100% - 26px),transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 12px,#000 calc(100% - 26px),transparent 100%)}
+.dscroll{position:absolute;z-index:1;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:calc(var(--dtop) + 4px) clamp(40px,11.3vw,56px) 24dvh}
 .dhead{display:flex;gap:12px;align-items:flex-start}
-.dpic{flex:none;width:136px;height:156px;object-fit:contain;will-change:transform}
+.dpic{flex:none;width:136px;height:156px;object-fit:contain}
 .dpic.flat{width:116px;height:116px;object-fit:cover;border-radius:16px;margin-top:6px}
 .dside{flex:1;min-width:0}
 .dtools{display:flex;justify-content:flex-end;gap:6px;height:30px;margin-top:-2px}
