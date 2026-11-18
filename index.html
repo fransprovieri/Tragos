@@ -26,7 +26,7 @@
 [data-bar="clasico"]{--bgc:#4E2230;--fg:#FCF2DE;--fgrgb:252,242,222;--fade:80dvh;--top:10.4dvh;--dtop:12dvh}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;background:#120b0e;font-family:var(--serif);overflow:hidden;overscroll-behavior:none}
-body{position:fixed;inset:0;width:100%}
+body{position:fixed;inset:0;width:100%;overflow:visible}
 body{display:flex;justify-content:center}
 .app{width:100%;max-width:480px;height:100%;position:relative;background:#120b0e;overflow:hidden;color:var(--fg)}
 button{font:inherit;color:inherit}
@@ -452,7 +452,7 @@ if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('sw.js')
 function fitApp(){
   const st = navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
   const h = st ? Math.max(innerHeight, screen.height) : innerHeight;
-  document.querySelector('.app').style.height = h+'px';
+  document.querySelector('.app').style.height = h+'px'; document.body.style.height = h+'px';
 }
 fitApp(); addEventListener('resize', fitApp); addEventListener('orientationchange', ()=>setTimeout(fitApp,300)); addEventListener('pageshow', fitApp);
 </script>
