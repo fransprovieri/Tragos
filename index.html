@@ -25,7 +25,8 @@
 [data-bar="tiki"]{--bgc:#F3D9A4;--fg:#2E1622;--fgrgb:46,22,34;--fade:83.5dvh;--top:10.4dvh;--dtop:12dvh}
 [data-bar="clasico"]{--bgc:#4E2230;--fg:#FCF2DE;--fgrgb:252,242,222;--fade:80dvh;--top:10.4dvh;--dtop:12dvh}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;background:#120b0e;font-family:var(--serif)}
+html,body{margin:0;height:100%;background:#120b0e;font-family:var(--serif);overflow:hidden;overscroll-behavior:none}
+body{position:fixed;inset:0;width:100%}
 body{display:flex;justify-content:center}
 .app{width:100%;max-width:480px;height:100dvh;position:relative;background:#120b0e;overflow:hidden;color:var(--fg)}
 button{font:inherit;color:inherit}
@@ -58,7 +59,7 @@ body[data-view="cards"] .vt .a svg{fill:var(--bgc);stroke:none}body[data-view="l
 .grain{position:absolute;inset:0;z-index:3;pointer-events:none;background:var(--grain)}
 .frame{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;z-index:4;opacity:0}
 body[data-f="0"] .frame[data-k="0"],body[data-f="1"] .frame[data-k="1"],body[data-f="2"] .frame[data-k="2"],body[data-f="3"] .frame[data-k="3"]{opacity:1}
-.scroll{position:absolute;inset:0;z-index:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+.scroll{position:absolute;inset:0;z-index:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:none;
   padding:calc(var(--top) + 62px) clamp(40px,11.3vw,56px) 24dvh}
 /* tapas con degradé (más livianas que una máscara): tapan la lista bajo el buscador y sobre la decoración de abajo */
 .bar::before,.results::before{content:"";position:absolute;left:0;right:0;top:0;height:calc(var(--top) + 44px + 7dvh);z-index:2;pointer-events:none;background:linear-gradient(to bottom,var(--bgc) calc(var(--top) + 44px),transparent)}
@@ -93,14 +94,14 @@ body[data-f="0"] .frame[data-k="0"],body[data-f="1"] .frame[data-k="1"],body[dat
 /* ---------- resultados de búsqueda (todos los tragos) ---------- */
 .results{position:absolute;inset:0;z-index:5;display:none;background:var(--bgc);color:var(--fg)}
 .results.show{display:block}
-.results .inner{position:absolute;inset:0;z-index:1;overflow-y:auto;overscroll-behavior:contain;padding:calc(var(--top) + 62px) clamp(40px,11.3vw,56px) 24dvh}
+.results .inner{position:absolute;inset:0;z-index:1;overflow-y:auto;overscroll-behavior:none;padding:calc(var(--top) + 62px) clamp(40px,11.3vw,56px) 24dvh}
 .results .count{margin:0 0 12px;font-size:12.5px;font-weight:700;color:rgba(var(--fgrgb),.62);letter-spacing:.4px}
 .none{text-align:center;color:rgba(var(--fgrgb),.62);margin-top:30px}
 
 /* ---------- vista del trago: el trago "se acerca" y la receta queda como hoja ---------- */
 .detail{position:absolute;inset:0;z-index:20;display:none;background:var(--bgc);color:var(--fg)}
 .detail.show{display:block}
-.dscroll{position:absolute;z-index:1;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:calc(var(--dtop) + 4px) clamp(40px,11.3vw,56px) 24dvh}
+.dscroll{position:absolute;z-index:1;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:none;padding:calc(var(--dtop) + 4px) clamp(40px,11.3vw,56px) 24dvh}
 .dhead{display:flex;gap:12px;align-items:flex-start}
 .dpic{flex:none;width:136px;height:156px;object-fit:contain}
 .dpic.flat{width:116px;height:116px;object-fit:cover;border-radius:16px;margin-top:6px}
