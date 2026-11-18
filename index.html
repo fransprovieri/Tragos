@@ -141,6 +141,33 @@ body.clasico-d .dscroll h3{color:#F0B046}
 .ed .irow input:first-child{flex:0 0 72px;width:72px;font-weight:700}
 .ed .irow button{flex:none;width:30px;height:30px;border:0;background:transparent;color:var(--fg);font-size:24px;line-height:1;padding:0;cursor:pointer}
 .ed textarea{min-height:120px;resize:none;border:1.5px dashed rgba(var(--fgrgb),.4);padding:9px;line-height:1.4}
+
+/* ---------- despensa ---------- */
+.mk-chips{position:absolute;left:0;right:0;top:calc(var(--top) + 52px);z-index:6;display:flex;gap:5px;padding:0 38px 0 22px;white-space:nowrap}
+.mk-chips button{height:30px;padding:0 9px;border:1.8px solid rgba(var(--fgrgb),.5);border-radius:999px;display:flex;align-items:center;background:transparent;font-family:var(--ruina);font-size:10px;letter-spacing:.5px;color:var(--fg);cursor:pointer;text-transform:uppercase}
+.mk-chips button.on{background:var(--fg);color:var(--bgc);border-color:var(--fg)}
+.mk-chips button i{font-style:normal;margin-left:5px;opacity:.7}
+.mk-chips button.pb{margin-left:auto;width:34px;padding:0;justify-content:center}
+.mk-chips button.pb svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.bar[data-bar="mi"] .scroll{padding-top:calc(var(--top) + 108px)}
+.mk-badge{position:absolute;top:2px;left:6px;height:22px;padding:0 9px;border-radius:999px;font-family:var(--ruina);font-size:11px;letter-spacing:.6px;display:flex;align-items:center;gap:4px;color:#fff;z-index:3}
+.mk-badge.ok{background:#3E9A4A}.mk-badge.near{background:#D58A1C}
+.row .mk-badge{position:static;display:inline-flex;height:17px;padding:0 7px;font-size:10px;margin-left:8px;vertical-align:2px}
+.mk-sec{grid-column:1/-1;font-family:var(--ruina);font-size:12px;letter-spacing:1px;color:var(--accent);margin:2px 0 -6px}
+.list .mk-sec{margin:14px 0 4px}.list .mk-sec:first-child{margin-top:0}
+.mk-pan h3{margin:22px 0 10px}
+.mk-pan .cl{display:flex;flex-wrap:wrap;gap:8px}
+.mk-pan .cl button{height:34px;padding:0 14px;border:1.8px solid rgba(var(--fgrgb),.45);border-radius:999px;display:flex;align-items:center;font-size:14.5px;background:transparent;color:var(--fg);cursor:pointer}
+.mk-pan .cl button.on{background:var(--fg);color:var(--bgc);border-color:var(--fg);font-weight:700}
+.mk-pan .cl button.on:before{content:"✓";margin-right:6px}
+.mk-pan .cl button.shop{border-style:dashed}
+.mk-sum{margin:16px 0 10px;padding:12px 14px;border:1.8px dashed rgba(var(--fgrgb),.45);border-radius:16px;font-size:14px;line-height:1.4}
+.mk-sum b{font-family:var(--ruina);font-weight:400;letter-spacing:.8px;font-size:13px;display:block;margin-bottom:3px}
+.mk-sum button{margin-top:8px;height:30px;padding:0 14px;border:1.8px solid rgba(var(--fgrgb),.75);border-radius:999px;background:transparent;color:var(--fg);font-family:var(--ruina);font-size:11px;letter-spacing:.8px;cursor:pointer}
+.ing li.miss span,.ing li.miss b{opacity:.5}.ing li.miss span{text-decoration:line-through}
+.ing li .st{margin-left:auto;font-style:normal;font-size:11px;font-family:var(--ruina);letter-spacing:.6px;align-self:center;white-space:nowrap}
+.ing li.have .st{color:#3E9A4A}.ing li.miss .st{color:#C4472A}
+.mk-btn{margin-top:14px;height:34px;padding:0 16px;border:1.8px solid rgba(var(--fgrgb),.75);border-radius:999px;display:inline-flex;align-items:center;background:transparent;color:var(--fg);font-family:var(--ruina);font-size:12px;letter-spacing:.8px;cursor:pointer}
 </style>
 </head>
 <body data-view="cards" data-bar="mi">
@@ -226,8 +253,60 @@ const pic = (d, cls) => ILL[d.id] ? `<img class="${cls}" src="${ILL[d.id]}" alt=
 const favBtn = id => `<button class="fav ${isFav(id)?'on':''}" data-fav="${id}" aria-label="Favorito">${HEART}</button>`;
 const sub = d => d.ing.map(i=>i[1].replace(/\s*\(.*?\)/g,'').replace(/ o .*$/,'')).filter(n=>!/^(hielo|agua|sal)/i.test(n)).slice(0,3).join(' · ');
 const nmCls = d => d.name.length>12 ? 'nm long' : 'nm';
-const tile = d => `<div class="tile" role="button" tabindex="0" data-id="${d.id}">${pic(d,'pic')}<div class="${nmCls(d)}">${d.name}</div>${favBtn(d.id)}</div>`;
-const row  = d => `<div class="row" role="button" tabindex="0" data-id="${d.id}">${pic(d,'th')}<div class="tx"><b>${d.name}</b><small>${sub(d)}</small></div>${favBtn(d.id)}</div>`;
+
+/* ---- despensa: ingredientes canónicos y cálculo de "qué puedo hacer" ---- */
+const CAT=[
+ ['Alcohol',[['gin','Gin'],['ron-blanco','Ron blanco'],['ron-oscuro','Ron oscuro'],['whisky','Whisky / bourbon'],['tequila','Tequila'],['vodka','Vodka'],['fernet','Fernet'],['campari','Campari'],['aperol','Aperol'],['cynar','Cynar'],['gancia','Gancia'],['prosecco','Prosecco']]],
+ ['Vermut y licores',[['vermut-rojo','Vermut rojo'],['vermut-seco','Vermut seco'],['licor-naranja','Licor de naranja'],['licor-cafe','Licor de café'],['orgeat','Orgeat'],['angostura','Angostura']]],
+ ['Jugos y frescos',[['lima','Lima'],['limon','Limón'],['anana','Ananá'],['naranja','Naranja'],['pomelo','Pomelo'],['menta','Menta'],['cafe','Café (espresso)']]],
+ ['Gaseosas y otros',[['soda','Soda'],['coca','Coca-Cola'],['sprite','Sprite'],['tonica','Tónica'],['jarabe','Jarabe / azúcar'],['crema-coco','Crema de coco']]]
+];
+const LBL={}; CAT.forEach(c=>c[1].forEach(([i,l])=>LBL[i]=l));
+const IGN=[/twist de \w+/,/rodaja de \w+/,/cascara de \w+/,/hielo( \w+)?/,/\bagua\b/,/\bsal\b/,/aceitunas?/,/cerezas?/,/granos? de cafe/,/nuez moscada/,/clara de huevo/,/opcional/];
+const RULES=[[/licor de cafe|kahlua/,['licor-cafe']],[/curacao( de naranja)?|licor de naranja|cointreau|triple sec/,['licor-naranja']],
+ [/ron blanco|ron claro/,['ron-blanco']],[/ron (oscuro|negro)/,['ron-oscuro']],[/\bron\b/,['ron-blanco','ron-oscuro']],
+ [/bourbon|\brye\b|whisk?e?y|scotch/,['whisky']],[/\bgin\b|ginebra/,['gin']],[/tequila/,['tequila']],[/vodka/,['vodka']],[/fernet/,['fernet']],
+ [/campari/,['campari']],[/aperol/,['aperol']],[/cynar/,['cynar']],[/gancia/,['gancia']],[/prosecco|espumante/,['prosecco']],
+ [/vermut (seco|dry)/,['vermut-seco']],[/vermut/,['vermut-rojo']],[/orgeat/,['orgeat']],[/angostura/,['angostura']],
+ [/tonica/,['tonica']],[/crema de coco/,['crema-coco']],[/coca/,['coca']],[/sprite/,['sprite']],[/soda/,['soda']],[/menta/,['menta']],
+ [/\blima\b/,['lima']],[/limon/,['limon']],[/anana/,['anana']],[/naranja/,['naranja']],[/pomelo/,['pomelo']],
+ [/espresso|cafe/,['cafe']],[/jarabe|azucar/,['jarabe']]];
+function ingIds(name){
+  let t=norm(name).replace(/\((?!o )[^)]*\)/g,' ').replace(/[()]/g,' ');
+  IGN.forEach(r=>{t=t.replace(r,' ');});
+  const ids=[]; RULES.forEach(([r,l])=>{ if(r.test(t)){ t=t.replace(r,' '); l.forEach(i=>{ if(!ids.includes(i)) ids.push(i); }); } });
+  return ids.length?ids:null;
+}
+const ls=(k)=>{ try{ const v=JSON.parse(localStorage.getItem(k)); if(Array.isArray(v)) return v.filter(i=>LBL[i]); }catch(e){} return []; };
+let pantry=ls('tragos.pantry'), shop=ls('tragos.shop');
+const savePantry=()=>{ try{ localStorage.setItem('tragos.pantry',JSON.stringify(pantry)); localStorage.setItem('tragos.shop',JSON.stringify(shop)); }catch(e){} };
+function status(d){
+  const g=d.ing.map(i=>ingIds(i[1])), real=g.filter(Boolean);
+  const ok=g.map(x=>x?x.some(i=>pantry.includes(i)):null);
+  const miss=real.filter((x,k)=>!x.some(i=>pantry.includes(i)));
+  return {g,ok,total:real.length,have:real.length-miss.length,miss};
+}
+const missLbl=x=>x.map(i=>LBL[i]).join(' / ');
+function badge(d){
+  if(!pantry.length) return '';
+  const s=status(d); if(!s.total) return '';
+  if(!s.miss.length) return `<span class="mk-badge ok">✓ ${s.have}/${s.total}</span>`;
+  if(s.miss.length===1) return `<span class="mk-badge near">${s.have}/${s.total}</span>`;
+  return '';
+}
+let mf='fav'; try{ const v=localStorage.getItem('tragos.mf'); if(['fav','mine','can'].includes(v)) mf=v; }catch(e){}
+function canLists(){
+  const ready=[],near=[];
+  DRINKS.forEach(d=>{ const s=status(d); if(!s.total) return; if(!s.miss.length) ready.push(d); else if(s.miss.length===1) near.push(d); });
+  return {ready,near};
+}
+const PANBTN='<svg viewBox="0 0 24 24"><path d="M7 3h10v3H7zM6 6h12l1 4v9a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-9z"/><path d="M5.5 12h13"/></svg>';
+function miChips(){
+  const n=pantry.length?canLists().ready.length:0;
+  return `<div class="mk-chips"><button data-mf="fav" class="${mf==='fav'?'on':''}">Favoritos</button><button data-mf="mine" class="${mf==='mine'?'on':''}">Mis recetas</button><button data-mf="can" class="${mf==='can'?'on':''}">Puedo hacer${n?`<i>${n}</i>`:''}</button><button class="pb" data-openpantry aria-label="Mi despensa">${PANBTN}</button></div>`;
+}
+const tile = d => `<div class="tile" role="button" tabindex="0" data-id="${d.id}">${pic(d,'pic')}${badge(d)}<div class="${nmCls(d)}">${d.name}</div>${favBtn(d.id)}</div>`;
+const row  = d => `<div class="row" role="button" tabindex="0" data-id="${d.id}">${pic(d,'th')}<div class="tx"><b>${d.name}${badge(d)}</b><small>${sub(d)}</small></div>${favBtn(d.id)}</div>`;
 const listHtml = list => view==='list' ? `<div class="list">${list.map(row).join('')}</div>` : `<div class="grid">${list.map(tile).join('')}</div>`;
 
 function barDrinks(id){
@@ -235,7 +314,22 @@ function barDrinks(id){
   if(id==='tiki') return DRINKS.filter(d=>d.bar==='tiki');
   return DRINKS;
 }
+function secList(parts){
+  const h=parts.map(p=>typeof p==='string'?`<div class="mk-sec">${p}</div>`:(view==='list'?row(p):tile(p))).join('');
+  return view==='list'?`<div class="list">${h}</div>`:`<div class="grid">${h}</div>`;
+}
+const emptyMsg=(t,m,btn)=>`<div class="empty"><b>${t}</b>${m}${btn?'<br><button class="mk-btn" data-openpantry>ARMAR MI DESPENSA</button>':''}</div>`;
 function barContent(id){
+  if(id==='mi'){
+    if(mf==='mine'){ const l=DRINKS.filter(d=>d.custom); return l.length?listHtml(l):emptyMsg('Sin recetas propias','Abrí cualquier trago y tocá “+ Mi versión” para crear la tuya.'); }
+    if(mf==='can'){
+      if(!pantry.length) return emptyMsg('Tu despensa está vacía','Marcá lo que tenés en casa y te muestro qué tragos podés preparar.',true);
+      const {ready,near}=canLists();
+      if(!ready.length&&!near.length) return emptyMsg('Todavía no alcanza','Con lo que tenés no llegás a ningún trago. Sumá ingredientes a tu despensa.',true);
+      const parts=[]; if(ready.length) parts.push('LISTOS PARA PREPARAR',...ready); if(near.length) parts.push('CASI · TE FALTA 1',...near);
+      return secList(parts);
+    }
+  }
   const l = barDrinks(id);
   if(!l.length) return `<div class="empty"><b>Tu bar está vacío</b>Tocá el corazón de cualquier trago y queda guardado acá.<small>Deslizá para ver los otros bares →</small></div>`;
   return listHtml(l);
@@ -244,7 +338,7 @@ function render(){
   const keep = [...document.querySelectorAll('.scroll')].map(s=>s.scrollTop);
   $('#pager').innerHTML = BARS.map(b => `
     <section class="bar" data-bar="${b.id}">
-      <div class="scroll">${barContent(b.id)}</div>
+      <div class="scroll">${barContent(b.id)}</div>${b.id==='mi'?miChips():''}
       <div class="grain"></div>${frames(b.id)}
     </section>`).join('');
   document.querySelectorAll('.scroll').forEach((s,i)=>s.scrollTop = keep[i]||0);
@@ -271,7 +365,32 @@ $('#dots').addEventListener('click', e=>{ const b=e.target.closest('button'); if
 /* ---- vista del trago ---- */
 let openId=null, porc=1;
 const fracBtns = () => PORC.map(([v,l])=>`<button data-p="${v}" class="${Math.abs(v-porc)<1e-6?'on':''}">${l}</button>`).join('');
-const ingHtml = d => d.ing.map(([a,n])=>`<li><b>${scaleQty(a,porc)}</b><span>${n}</span></li>`).join('');
+const ingHtml = d => { const st=pantry.length?status(d):null; return d.ing.map(([a,n],k)=>{ const o=st&&st.ok[k]; const c=o===true?' class="have"':o===false?' class="miss"':''; return `<li${c}><b>${scaleQty(a,porc)}</b><span>${n}</span>${o===true?'<i class="st">LO TENÉS</i>':o===false?'<i class="st">FALTA</i>':''}</li>`; }).join(''); };
+function paintBox(){
+  const d=byId[openId]; if(!d) return; const box=$('#pBox'), sh=$('#pShop'); if(!box) return;
+  if(!pantry.length){ box.innerHTML=`<div class="mk-sum"><b>¿QUÉ TE FALTA?</b>Cargá tu despensa y te marco qué ingredientes tenés para este trago.<br><button data-openpantry>ARMAR MI DESPENSA</button></div>`; sh.innerHTML=''; return; }
+  const s=status(d); if(!s.total){ box.innerHTML=''; sh.innerHTML=''; return; }
+  const pct=Math.round(100*s.have/s.total);
+  box.innerHTML=`<div class="mk-sum"><b>TENÉS ${s.have} DE ${s.total} · ${pct}%</b>${s.miss.length?'Te falta: '+s.miss.map(missLbl).join(', ').toLowerCase()+'.':'¡Tenés todo para prepararlo!'}</div>`;
+  const pend=s.miss.filter(x=>!shop.includes(x[0]));
+  sh.innerHTML=!s.miss.length?'':pend.length?`<button class="mk-btn" data-addshop>+ AGREGAR A LA LISTA DE COMPRAS</button>`:`<button class="mk-btn" data-openpantry>✓ EN TU LISTA · VER</button>`;
+}
+/* ---- pantalla de despensa ---- */
+function pantryBody(){
+  const {ready,near}=canLists();
+  const sum=pantry.length?`<b>${pantry.length} ${pantry.length===1?'INGREDIENTE':'INGREDIENTES'}</b>Podés preparar ${ready.length} ${ready.length===1?'trago':'tragos'}${near.length?` y estás a 1 ingrediente de otros ${near.length}`:''}.`:`<b>TU DESPENSA</b>Tocá lo que tenés en casa. Se guarda solo.`;
+  const cats=CAT.map(([n,l])=>`<h3>${n}</h3><div class="cl">${l.map(([i,t])=>`<button data-pi="${i}" class="${pantry.includes(i)?'on':''}">${t}</button>`).join('')}</div>`).join('');
+  const sp=shop.length?`<h3>Para comprar</h3><div class="cl">${shop.map(i=>`<button class="shop" data-bought="${i}">${LBL[i]}</button>`).join('')}</div><div class="empty" style="padding:8px 0;text-align:left"><small>Tocá uno cuando lo compres y pasa a tu despensa.</small></div>`:'';
+  return `<div class="mk-sum">${sum}</div>${sp}${cats}`;
+}
+let pdirty=false;
+function openPantry(){
+  const det=$('#detail'); openId=null;
+  det.innerHTML=`<div class="dscroll mk-pan"><div class="dhead"><div class="dside"><div class="dtools"><button data-close aria-label="Cerrar">×</button></div><h2 class="dname" style="margin-top:0">Mi despensa</h2><div class="dchips">Tocá lo que tenés en casa. Se guarda solo.</div></div></div><div id="pBody">${pantryBody()}</div></div><div class="grain"></div>${frames(BARS[cur].id)}`;
+  paintBar(); det.classList.add('show'); det.setAttribute('aria-hidden','false');
+  if(det.animate) det.animate([{opacity:0},{opacity:1}],{duration:220,easing:'ease-out'});
+}
+
 function paintPorc(){
   const d=byId[openId]; if(!d) return;
   $('#porcVal').textContent = porcLabel(porc);
@@ -297,12 +416,14 @@ function openSheet(id, src){
       </div>
       <div class="dact">${d.custom?'<button data-edit>Editar</button><button data-del class="danger">Borrar</button>':'<button data-newv>+ Mi versión</button>'}</div>
       <h3>Ingredientes</h3>
+      <div id="pBox"></div>
       <ul class="ing" id="ingList">${ingHtml(d)}</ul>
+      <div id="pShop"></div>
       <h3>Preparación</h3>
       <ol class="steps">${d.steps.map(s=>`<li>${s}</li>`).join('')}</ol>
     </div>
     <div class="grain"></div>${frames(BARS[cur].id)}`;
-  paintBar();
+  paintBar(); paintBox();
   det.classList.add('show'); det.setAttribute('aria-hidden','false');
   const rm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(!rm && det.animate){
@@ -319,7 +440,7 @@ function openSheet(id, src){
 }
 function closeSheet(){
   const det=$('#detail'); if(!det.classList.contains('show')) return;
-  const end=()=>{ det.classList.remove('show'); det.setAttribute('aria-hidden','true'); det.innerHTML=''; openId=null; };
+  const end=()=>{ det.classList.remove('show'); det.setAttribute('aria-hidden','true'); det.innerHTML=''; openId=null; if(pdirty){ pdirty=false; render(); goTo(cur,false); runSearch(); } };
   if(det.animate){ const a=det.animate([{opacity:1},{opacity:0}],{duration:150}); a.onfinish=end; } else end();
 }
 /* ---- editor de versiones ---- */
@@ -376,6 +497,14 @@ function delCustom(id){
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeSheet(); if((e.key==='Enter'||e.key===' ') && (e.target.classList?.contains('tile')||e.target.classList?.contains('row'))){ e.preventDefault(); openSheet(e.target.dataset.id, e.target);} });
 
 document.addEventListener('click', e=>{
+  const mfb=e.target.closest('[data-mf]');
+  if(mfb){ mf=mfb.dataset.mf; try{ localStorage.setItem('tragos.mf',mf); }catch(e){} render(); goTo(cur,false); return; }
+  if(e.target.closest('[data-openpantry]')){ openPantry(); return; }
+  const pi=e.target.closest('[data-pi]');
+  if(pi){ const i=pi.dataset.pi; pantry=pantry.includes(i)?pantry.filter(x=>x!==i):[...pantry,i]; shop=shop.filter(x=>x!==i); savePantry(); pdirty=true; $('#pBody').innerHTML=pantryBody(); return; }
+  const bg=e.target.closest('[data-bought]');
+  if(bg){ const i=bg.dataset.bought; shop=shop.filter(x=>x!==i); if(!pantry.includes(i)) pantry.push(i); savePantry(); pdirty=true; $('#pBody').innerHTML=pantryBody(); return; }
+  if(e.target.closest('[data-addshop]')){ const d=byId[openId]; if(d){ status(d).miss.forEach(x=>{ if(!x.some(i=>shop.includes(i))) shop.push(x[0]); }); savePantry(); paintBox(); } return; }
   if(e.target.closest('[data-close]')){ closeSheet(); return; }
   if(e.target.closest('[data-newv],[data-edit]')){ openEditor(openId); return; }
   if(e.target.closest('[data-del]')){ delCustom(openId); return; }
