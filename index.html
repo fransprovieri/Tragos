@@ -61,9 +61,10 @@ body[data-f="0"] .frame[data-k="0"],body[data-f="1"] .frame[data-k="1"],body[dat
 .scroll{position:absolute;inset:0;z-index:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
   padding:calc(var(--top) + 62px) clamp(40px,11.3vw,56px) 24dvh}
 /* tapas con degradé (más livianas que una máscara): tapan la lista bajo el buscador y sobre la decoración de abajo */
-.bar::before,.results::before{content:"";position:absolute;left:0;right:0;top:0;height:calc(var(--top) + 44px + 3.5dvh);z-index:2;pointer-events:none;background:linear-gradient(to bottom,var(--bgc) calc(var(--top) + 44px),transparent)}
+.bar::before,.results::before{content:"";position:absolute;left:0;right:0;top:0;height:calc(var(--top) + 44px + 7dvh);z-index:2;pointer-events:none;background:linear-gradient(to bottom,var(--bgc) calc(var(--top) + 44px),transparent)}
 .detail::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--dtop);z-index:2;pointer-events:none;background:linear-gradient(to bottom,var(--bgc) calc(var(--dtop) - 3.5dvh),transparent)}
-.bar::after,.results::after,.detail::after{content:"";position:absolute;left:0;right:0;top:calc(var(--fade) - 3.5dvh);bottom:0;z-index:2;pointer-events:none;background:linear-gradient(to bottom,transparent,var(--bgc) 3.5dvh)}
+.bar::after,.results::after,.detail::after{content:"";position:absolute;left:0;right:0;top:calc(var(--fade) - 9dvh);bottom:0;z-index:2;pointer-events:none;background:linear-gradient(to bottom,transparent,var(--bgc) 9dvh)}
+@supports (color: color-mix(in srgb,red,blue)){.bar::after,.results::after,.detail::after{background:linear-gradient(to bottom,transparent,color-mix(in srgb,var(--bgc) 12%,transparent) 1.8dvh,color-mix(in srgb,var(--bgc) 40%,transparent) 4dvh,color-mix(in srgb,var(--bgc) 75%,transparent) 6.5dvh,var(--bgc) 9dvh)}}
 
 /* tragos directo sobre el fondo, sin tarjetas */
 .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:16px;row-gap:26px}
