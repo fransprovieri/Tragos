@@ -54,14 +54,15 @@ body[data-view="cards"] .vt .a svg{fill:var(--bgc);stroke:none}body[data-view="l
 /* ---------- bares ---------- */
 .pager{position:absolute;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:none}
 .pager::-webkit-scrollbar{display:none}
-.bar{flex:0 0 100%;position:relative;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:var(--bgc) var(--grain);color:var(--fg)}
-.frame{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;z-index:3}
+.bar{flex:0 0 100%;position:relative;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:var(--bgc);color:var(--fg)}
+.grain{position:absolute;inset:0;z-index:3;pointer-events:none;background:var(--grain)}
+.frame{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;z-index:4}
 .scroll{position:absolute;inset:0;z-index:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
   padding:calc(var(--top) + 62px) clamp(40px,11.3vw,56px) 24dvh}
 /* tapas con degradé (más livianas que una máscara): tapan la lista bajo el buscador y sobre la decoración de abajo */
-.bar::before,.results::before{content:"";position:absolute;left:0;right:0;top:0;height:calc(var(--top) + 44px + 3.5dvh);z-index:2;pointer-events:none;background:var(--grain),linear-gradient(to bottom,var(--bgc) calc(var(--top) + 44px),transparent)}
-.detail::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--dtop);z-index:2;pointer-events:none;background:var(--grain),linear-gradient(to bottom,var(--bgc) calc(var(--dtop) - 3.5dvh),transparent)}
-.bar::after,.results::after,.detail::after{content:"";position:absolute;left:0;right:0;top:calc(var(--fade) - 3.5dvh);bottom:0;z-index:2;pointer-events:none;background:var(--grain),linear-gradient(to bottom,transparent,var(--bgc) 3.5dvh)}
+.bar::before,.results::before{content:"";position:absolute;left:0;right:0;top:0;height:calc(var(--top) + 44px + 3.5dvh);z-index:2;pointer-events:none;background:linear-gradient(to bottom,var(--bgc) calc(var(--top) + 44px),transparent)}
+.detail::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--dtop);z-index:2;pointer-events:none;background:linear-gradient(to bottom,var(--bgc) calc(var(--dtop) - 3.5dvh),transparent)}
+.bar::after,.results::after,.detail::after{content:"";position:absolute;left:0;right:0;top:calc(var(--fade) - 3.5dvh);bottom:0;z-index:2;pointer-events:none;background:linear-gradient(to bottom,transparent,var(--bgc) 3.5dvh)}
 
 /* tragos directo sobre el fondo, sin tarjetas */
 .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:16px;row-gap:26px}
@@ -88,14 +89,14 @@ body[data-view="cards"] .vt .a svg{fill:var(--bgc);stroke:none}body[data-view="l
 .empty small{display:block;margin-top:10px;font-size:12.5px;color:rgba(var(--fgrgb),.62)}
 
 /* ---------- resultados de búsqueda (todos los tragos) ---------- */
-.results{position:absolute;inset:0;z-index:5;display:none;background:var(--bgc) var(--grain);color:var(--fg)}
+.results{position:absolute;inset:0;z-index:5;display:none;background:var(--bgc);color:var(--fg)}
 .results.show{display:block}
 .results .inner{position:absolute;inset:0;z-index:1;overflow-y:auto;overscroll-behavior:contain;padding:calc(var(--top) + 62px) clamp(40px,11.3vw,56px) 24dvh}
 .results .count{margin:0 0 12px;font-size:12.5px;font-weight:700;color:rgba(var(--fgrgb),.62);letter-spacing:.4px}
 .none{text-align:center;color:rgba(var(--fgrgb),.62);margin-top:30px}
 
 /* ---------- vista del trago: el trago "se acerca" y la receta queda como hoja ---------- */
-.detail{position:absolute;inset:0;z-index:20;display:none;background:var(--bgc) var(--grain);color:var(--fg)}
+.detail{position:absolute;inset:0;z-index:20;display:none;background:var(--bgc);color:var(--fg)}
 .detail.show{display:block}
 .dscroll{position:absolute;z-index:1;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:calc(var(--dtop) + 4px) clamp(40px,11.3vw,56px) 24dvh}
 .dhead{display:flex;gap:12px;align-items:flex-start}
@@ -225,7 +226,7 @@ function render(){
   $('#pager').innerHTML = BARS.map(b => `
     <section class="bar" data-bar="${b.id}">
       <div class="scroll">${barContent(b.id)}</div>
-      <img class="frame" src="assets/marco/${b.id}.webp" alt="" decoding="async">
+      <div class="grain"></div><img class="frame" src="assets/marco/${b.id}.webp" alt="" decoding="async">
     </section>`).join('');
   document.querySelectorAll('.scroll').forEach((s,i)=>s.scrollTop = keep[i]||0);
   $('#dots').innerHTML = BARS.map((b,i)=>`<button data-i="${i}" aria-label="${b.name}" class="${i===cur?'on':''}">${NAVICO[b.id]}<span>${b.label}</span></button>`).join('');
@@ -277,7 +278,7 @@ function openSheet(id, src){
       <h3>Preparación</h3>
       <ol class="steps">${d.steps.map(s=>`<li>${s}</li>`).join('')}</ol>
     </div>
-    <img class="frame" src="assets/marco/${BARS[cur].id}.webp" alt="">`;
+    <div class="grain"></div><img class="frame" src="assets/marco/${BARS[cur].id}.webp" alt="">`;
   paintBar();
   det.classList.add('show'); det.setAttribute('aria-hidden','false');
   const rm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -351,7 +352,7 @@ function runSearch(){
   box.classList.add('show'); paintBar();
   box.innerHTML = `<div class="inner">` + (hits.length
     ? `<p class="count">${hits.length} ${hits.length===1?'resultado':'resultados'}</p>${listHtml(hits)}`
-    : `<p class="none">No encontré ningún trago con “${raw.replace(/</g,'&lt;')}”.</p>`) + `</div><img class="frame" src="assets/marco/${BARS[cur].id}.webp" alt="">`;
+    : `<p class="none">No encontré ningún trago con “${raw.replace(/</g,'&lt;')}”.</p>`) + `</div><div class="grain"></div><img class="frame" src="assets/marco/${BARS[cur].id}.webp" alt="">`;
   if(wasShown) box.querySelector('.inner').scrollTop = prev;
 }
 $('#q').addEventListener('input', runSearch);
