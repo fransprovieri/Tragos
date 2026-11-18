@@ -1,6 +1,6 @@
-const C='tragos-v9';
+const C='tragos-v10';
 const FILES=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-180.png','./assets/Ruina.ttf',
- ...['mi','tiki','clasico'].map(b=>`./assets/marco/${b}.webp`),
+ ...['mi','tiki','clasico'].flatMap(b=>[0,1,2,3].map(f=>`./assets/marco/${b}_${f}.webp`)),
  ...['old-fashioned','mai-tai','pina-colada','painkiller','jungle-bird','daiquiri','negroni','margarita','martini','manhattan','mojito','aperol-spritz','whiskey-sour','espresso-martini','fernet-coca','cynar-pomelo','gancia-sprite'].map(d=>`./assets/drinks/${d}.webp`)];
 /* al instalar, baja todo de nuevo desde la red (sin usar el caché del navegador) */
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>Promise.all(FILES.map(f=>fetch(new Request(f,{cache:'reload'})).then(r=>{if(r.ok)return c.put(f,r)}))) ).then(()=>self.skipWaiting()))});

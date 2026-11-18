@@ -56,7 +56,8 @@ body[data-view="cards"] .vt .a svg{fill:var(--bgc);stroke:none}body[data-view="l
 .pager::-webkit-scrollbar{display:none}
 .bar{flex:0 0 100%;position:relative;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:var(--bgc);color:var(--fg)}
 .grain{position:absolute;inset:0;z-index:3;pointer-events:none;background:var(--grain)}
-.frame{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;z-index:4}
+.frame{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;z-index:4;opacity:0}
+body[data-f="0"] .frame[data-k="0"],body[data-f="1"] .frame[data-k="1"],body[data-f="2"] .frame[data-k="2"],body[data-f="3"] .frame[data-k="3"]{opacity:1}
 .scroll{position:absolute;inset:0;z-index:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
   padding:calc(var(--top) + 62px) clamp(40px,11.3vw,56px) 24dvh}
 /* tapas con degradé (más livianas que una máscara): tapan la lista bajo el buscador y sobre la decoración de abajo */
@@ -226,11 +227,14 @@ function render(){
   $('#pager').innerHTML = BARS.map(b => `
     <section class="bar" data-bar="${b.id}">
       <div class="scroll">${barContent(b.id)}</div>
-      <div class="grain"></div><img class="frame" src="assets/marco/${b.id}.webp" alt="" decoding="async">
+      <div class="grain"></div>${frames(b.id)}
     </section>`).join('');
   document.querySelectorAll('.scroll').forEach((s,i)=>s.scrollTop = keep[i]||0);
   $('#dots').innerHTML = BARS.map((b,i)=>`<button data-i="${i}" aria-label="${b.name}" class="${i===cur?'on':''}">${NAVICO[b.id]}<span>${b.label}</span></button>`).join('');
 }
+
+/* ---- marcos animados: 4 poses, ~4 cuadros por segundo (stop-motion) ---- */
+const frames = id => [0,1,2,3].map(k=>`<img class="frame" data-k="${k}" src="assets/marco/${id}_${k}.webp" alt="" decoding="async">`).join('');
 
 /* ---- navegación entre bares (deslizar) ---- */
 let cur = 0;
@@ -278,7 +282,7 @@ function openSheet(id, src){
       <h3>Preparación</h3>
       <ol class="steps">${d.steps.map(s=>`<li>${s}</li>`).join('')}</ol>
     </div>
-    <div class="grain"></div><img class="frame" src="assets/marco/${BARS[cur].id}.webp" alt="">`;
+    <div class="grain"></div>${frames(BARS[cur].id)}`;
   paintBar();
   det.classList.add('show'); det.setAttribute('aria-hidden','false');
   const rm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -352,13 +356,16 @@ function runSearch(){
   box.classList.add('show'); paintBar();
   box.innerHTML = `<div class="inner">` + (hits.length
     ? `<p class="count">${hits.length} ${hits.length===1?'resultado':'resultados'}</p>${listHtml(hits)}`
-    : `<p class="none">No encontré ningún trago con “${raw.replace(/</g,'&lt;')}”.</p>`) + `</div><div class="grain"></div><img class="frame" src="assets/marco/${BARS[cur].id}.webp" alt="">`;
+    : `<p class="none">No encontré ningún trago con “${raw.replace(/</g,'&lt;')}”.</p>`) + `</div><div class="grain"></div>${frames(BARS[cur].id)}`;
   if(wasShown) box.querySelector('.inner').scrollTop = prev;
 }
 $('#q').addEventListener('input', runSearch);
 $('#q').addEventListener('keydown', e=>{ if(e.key==='Enter') e.target.blur(); });
 $('#clear').addEventListener('click', e=>{ e.preventDefault(); $('#q').value=''; runSearch(); $('#q').focus(); });
 
+let fr = 0; document.body.dataset.f = 0;
+const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(!reduce) setInterval(()=>{ if(document.hidden) return; fr=(fr+1)%4; document.body.dataset.f = fr; }, 250);
 paintBar();
 render();
 requestAnimationFrame(()=>goTo(cur, false));
