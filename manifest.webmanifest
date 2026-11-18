@@ -1,6 +1,6 @@
 {
-  "name": "Mis Tragos",
-  "short_name": "Tragos",
+  "name": "Painkiller",
+  "short_name": "Painkiller",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
