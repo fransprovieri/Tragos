@@ -129,6 +129,16 @@ body.clasico-d .dscroll h3{color:#F0B046}
 .steps li::before{content:counter(s);position:absolute;left:0;top:0;font-family:var(--ruina);color:var(--accent)}
 [data-bar="clasico"] .steps li::before{color:#F0B046}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important}}
+.dact{display:flex;gap:8px;margin-top:16px}
+.dact button{height:32px;padding:0 14px;border:1.8px solid rgba(var(--fgrgb),.75);border-radius:999px;background:transparent;color:var(--fg);font-family:var(--ruina);font-size:12px;letter-spacing:.8px;cursor:pointer}
+.dact button.danger{opacity:.65}
+.ed{padding-top:34px}
+.ed input,.ed textarea{width:100%;background:transparent;border:0;border-bottom:1.5px dashed rgba(var(--fgrgb),.4);color:var(--fg);font:inherit;font-size:16px;padding:7px 0;border-radius:0;outline:0;-webkit-appearance:none}
+.ed .nm{font-family:var(--ruina);font-size:26px;text-transform:uppercase;letter-spacing:.4px}
+.ed .irow{display:flex;gap:10px;align-items:center}
+.ed .irow input:first-child{flex:0 0 72px;width:72px;font-weight:700}
+.ed .irow button{flex:none;width:30px;height:30px;border:0;background:transparent;color:var(--fg);font-size:24px;line-height:1;padding:0;cursor:pointer}
+.ed textarea{min-height:120px;resize:none;border:1.5px dashed rgba(var(--fgrgb),.4);padding:9px;line-height:1.4}
 </style>
 </head>
 <body data-view="cards" data-bar="mi">
@@ -170,6 +180,12 @@ const $ = s => document.querySelector(s);
 const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
 const byId = Object.fromEntries(DRINKS.map(d => [d.id, d]));
 const HEART = '<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
+
+/* ---- mis versiones (se guardan en el teléfono) ---- */
+let customs=(()=>{ try{ const v=JSON.parse(localStorage.getItem('tragos.custom')); if(Array.isArray(v)) return v.filter(c=>c&&c.id&&c.name&&Array.isArray(c.ing)); }catch(e){} return []; })();
+const saveCustoms=()=>{ try{ localStorage.setItem('tragos.custom', JSON.stringify(customs)); }catch(e){} };
+function regCustom(c){ DRINKS.push(c); byId[c.id]=c; if(ILL[c.from]) ILL[c.id]=ILL[c.from]; }
+customs.forEach(regCustom);
 
 /* ---- favoritos y vista (se guardan en el teléfono) ---- */
 let favs = (()=>{ try{ const v = JSON.parse(localStorage.getItem('tragos.favs')); if(Array.isArray(v)) return v.filter(id=>byId[id]); }catch(e){} return []; })();
@@ -277,6 +293,7 @@ function openSheet(id, src){
           <div class="fracs" id="fracs">${fracBtns()}</div>
         </div>
       </div>
+      <div class="dact">${d.custom?'<button data-edit>Editar</button><button data-del class="danger">Borrar</button>':'<button data-newv>+ Mi versión</button>'}</div>
       <h3>Ingredientes</h3>
       <ul class="ing" id="ingList">${ingHtml(d)}</ul>
       <h3>Preparación</h3>
@@ -303,10 +320,68 @@ function closeSheet(){
   const end=()=>{ det.classList.remove('show'); det.setAttribute('aria-hidden','true'); det.innerHTML=''; openId=null; };
   if(det.animate){ const a=det.animate([{opacity:1},{opacity:0}],{duration:150}); a.onfinish=end; } else end();
 }
+/* ---- editor de versiones ---- */
+let ed=null;
+const esc = t => String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function nextName(d){ const b=byId[d.from]||d; return `${b.name} v${customs.filter(c=>c.from===b.id).length+2}`; }
+function openEditor(id){
+  const d=byId[id]; if(!d) return;
+  ed={id, editing:!!d.custom, name:d.custom?d.name:nextName(d), ing:d.ing.map(x=>[x[0],x[1]]), steps:d.steps.slice()};
+  paintEditor();
+}
+function paintEditor(){
+  const sc=$('#dscroll'); if(!sc) return;
+  sc.scrollTop=0;
+  sc.innerHTML=`<div class="ed">
+    <span class="lbl">NOMBRE</span><input class="nm" id="edName" value="${esc(ed.name)}" maxlength="40" autocomplete="off">
+    <h3>Ingredientes</h3>
+    <div id="edIng">${ed.ing.map((x,i)=>`<div class="irow"><input data-q="${i}" value="${esc(x[0])}" placeholder="30 ml" autocomplete="off" autocapitalize="off"><input data-n="${i}" value="${esc(x[1])}" placeholder="Ingrediente" autocomplete="off"><button data-rm="${i}" aria-label="Quitar">×</button></div>`).join('')}</div>
+    <div class="dact"><button data-adding>+ Ingrediente</button></div>
+    <h3>Preparación</h3>
+    <textarea id="edSteps" placeholder="Un paso por línea">${esc(ed.steps.join('\n'))}</textarea>
+    <div class="dact" style="margin-top:22px"><button data-edsave>Guardar</button><button data-edcancel>Cancelar</button></div>
+  </div>`;
+}
+function syncEd(){
+  if(!ed||!$('#edName')) return;
+  ed.name=$('#edName').value;
+  ed.ing=[...document.querySelectorAll('#edIng .irow')].map(r=>{ const i=r.querySelectorAll('input'); return [i[0].value,i[1].value]; });
+  ed.steps=$('#edSteps').value.split('\n');
+}
+function saveEd(){
+  syncEd();
+  const base=byId[ed.id];
+  const name=ed.name.trim()||nextName(base);
+  const ing=ed.ing.map(x=>[x[0].trim(),x[1].trim()]).filter(x=>x[1]);
+  if(!ing.length){ alert('Agregá al menos un ingrediente'); return; }
+  const steps=ed.steps.map(x=>x.trim()).filter(Boolean);
+  let id=ed.id;
+  if(ed.editing){ Object.assign(base,{name,ing,steps}); }
+  else{
+    const c={id:'c'+Date.now().toString(36), custom:true, from:base.from||base.id, name, bar:base.bar, glass:base.glass, method:base.method, garnish:base.garnish, img:ILL[base.from||base.id]?undefined:base.img, ing, steps};
+    customs.push(c); regCustom(c); favs.push(c.id); saveFavs(); id=c.id;
+  }
+  saveCustoms(); ed=null;
+  render(); goTo(cur,false); runSearch(); openSheet(id);
+}
+function delCustom(id){
+  if(!confirm('¿Borrar esta versión?')) return;
+  customs=customs.filter(c=>c.id!==id);
+  const i=DRINKS.findIndex(x=>x.id===id); if(i>=0) DRINKS.splice(i,1);
+  delete byId[id]; delete ILL[id]; favs=favs.filter(x=>x!==id);
+  saveCustoms(); saveFavs(); closeSheet(); render(); goTo(cur,false); runSearch();
+}
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeSheet(); if((e.key==='Enter'||e.key===' ') && (e.target.classList?.contains('tile')||e.target.classList?.contains('row'))){ e.preventDefault(); openSheet(e.target.dataset.id, e.target);} });
 
 document.addEventListener('click', e=>{
   if(e.target.closest('[data-close]')){ closeSheet(); return; }
+  if(e.target.closest('[data-newv],[data-edit]')){ openEditor(openId); return; }
+  if(e.target.closest('[data-del]')){ delCustom(openId); return; }
+  if(e.target.closest('[data-edcancel]')){ const id=ed&&ed.id; ed=null; openSheet(id); return; }
+  if(e.target.closest('[data-edsave]')){ saveEd(); return; }
+  if(e.target.closest('[data-adding]')){ syncEd(); ed.ing.push(['','']); paintEditor(); const q=document.querySelectorAll('#edIng .irow'); q[q.length-1].querySelector('input').focus(); return; }
+  const rmb=e.target.closest('[data-rm]');
+  if(rmb){ syncEd(); ed.ing.splice(+rmb.dataset.rm,1); paintEditor(); return; }
   const s = e.target.closest('[data-s]');
   if(s){
     const i = PORC.findIndex(x=>Math.abs(x[0]-porc)<1e-6) ;
