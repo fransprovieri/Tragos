@@ -170,6 +170,9 @@ body.clasico-d .dscroll h3{color:#F0B046}
 .ing li .st{margin-left:auto;font-style:normal;font-size:11px;font-family:var(--ruina);letter-spacing:.6px;align-self:center;white-space:nowrap}
 .ing li.have .st{color:#3E9A4A}.ing li.miss .st{color:#C4472A}
 .mk-btn{margin-top:14px;height:34px;padding:0 16px;border:1.8px solid rgba(var(--fgrgb),.75);border-radius:999px;display:inline-flex;align-items:center;background:transparent;color:var(--fg);font-family:var(--ruina);font-size:12px;letter-spacing:.8px;cursor:pointer}
+.vtabs{display:flex;gap:6px;margin-top:16px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.vtabs::-webkit-scrollbar{display:none}
+.vtabs button{flex:none;height:30px;padding:0 13px;border:1.8px solid rgba(var(--fgrgb),.5);border-radius:999px;background:transparent;color:var(--fg);font-family:var(--ruina);font-size:11px;letter-spacing:.6px;text-transform:uppercase;cursor:pointer}
+.vtabs button.on{background:var(--fg);color:var(--bgc);border-color:var(--fg)}
 </style>
 </head>
 <body data-view="cards" data-bar="mi">
@@ -213,19 +216,19 @@ const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
 /* ---- más tragos tiki y versiones (recetas armadas con medidas habituales, a gusto) ---- */
 const V=(id,name,glass,method,garnish,tags,ing,steps,ill)=>({id,name,bar:'tiki',glass,method,garnish,tags,ing,steps,ill});
 const MORE=[
- V('mai-tai-vic','Mai Tai · Trader Vic 1944','Vaso old fashioned','Shaker','Menta y cáscara de lima',
+ V('mai-tai-vic','Mai Tai · Vic 1944','Vaso old fashioned','Shaker','Menta y cáscara de lima',
   'mai tai trader vic original ron añejo curacao orgeat lima menta tiki clasico version',
   [['60 ml','Ron añejo jamaiquino'],['15 ml','Curaçao de naranja'],['8 ml','Orgeat'],['8 ml','Jarabe simple'],['30 ml','Jugo de lima'],['—','Hielo picado']],
   ['Shakeá todo con hielo.','Colá sobre hielo picado en el vaso.','Decorá con la cáscara de lima exprimida y una rama de menta.'],'mai-tai'),
- V('mai-tai-2','Mai Tai · dos rones','Vaso old fashioned','Shaker','Menta y lima',
-  'mai tai dos rones jamaiquino agricole curacao orgeat lima menta tiki moderno version',
+ V('mai-tai-2','Mai Tai · SC','Vaso old fashioned','Shaker','Menta y lima',
+  'mai tai sc smugglers cove dos rones jamaiquino agricole curacao orgeat lima menta tiki moderno version',
   [['30 ml','Ron jamaiquino'],['30 ml','Ron agricole'],['15 ml','Curaçao de naranja'],['15 ml','Orgeat'],['30 ml','Jugo de lima'],['—','Hielo picado']],
   ['Shakeá todo con hielo.','Colá sobre hielo picado.','Decorá con menta y media lima exprimida.'],'mai-tai'),
  V('zombie','Zombie','Vaso alto','Shaker','Menta, lima y cereza',
-  'zombie tiki ron blanco ron oscuro overproof lima pomelo granadina canela angostura donn beach',
+  'zombie simple tiki ron blanco ron oscuro overproof lima pomelo granadina canela angostura donn beach',
   [['45 ml','Ron blanco'],['45 ml','Ron oscuro'],['30 ml','Ron overproof'],['30 ml','Jugo de lima'],['15 ml','Jugo de pomelo'],['15 ml','Jarabe de canela'],['10 ml','Granadina'],['2 dashes','Angostura'],['—','Hielo picado']],
   ['Shakeá todo con hielo.','Colá sobre hielo picado en un vaso alto.','Decorá con menta, lima y cereza.','Ojo: lleva tres rones, tomalo con calma.'],'zombie'),
- V('zombie-donn','Zombie · Donn Beach 1934','Vaso alto','Shaker','Menta y lima',
+ V('zombie-donn','Zombie · Donn 1934','Vaso alto','Shaker','Menta y lima',
   'zombie donn beach 1934 original ron jamaiquino dorado demerara 151 lima pomelo canela falernum pernod angostura',
   [['45 ml','Ron jamaiquino dorado'],['45 ml','Ron dorado de Puerto Rico'],['30 ml','Ron demerara 151'],['22 ml','Jugo de lima'],['15 ml','Jugo de pomelo'],['8 ml','Jarabe de canela'],['15 ml','Falernum'],['1 dash','Angostura'],['6 gotas','Pernod'],['5 ml','Granadina']],
   ['Shakeá todo con hielo picado (poco tiempo).','Serví todo, con el hielo, en un vaso alto.','Decorá con una rama de menta.'],'zombie'),
@@ -243,19 +246,26 @@ const MORE=[
   ['Shakeá todo con hielo.','Colá sobre hielo picado en un vaso alto.','Pinchá tres cerezas y un trozo de ananá y apoyalos arriba.'],'three-dots')
 ];
 MORE.forEach(m=>{ const {ill,...d}=m; DRINKS.push(d); ILL[d.id]=ILL[ill]; });
+/* versiones: un solo trago con varias recetas adentro (of = trago principal, vl = nombre corto de la pestaña) */
+const VERS={'mai-tai':['','Clásico'],'mai-tai-vic':['mai-tai','Vic 1944'],'mai-tai-2':['mai-tai','SC'],'zombie':['','Simple'],'zombie-donn':['zombie','Donn 1934']};
+DRINKS.forEach(d=>{ const v=VERS[d.id]; if(v){ if(v[0]) d.of=v[0]; d.vl=v[1]; } });
 const byId = Object.fromEntries(DRINKS.map(d => [d.id, d]));
 const HEART = '<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
 
 /* ---- mis versiones (se guardan en el teléfono) ---- */
 let customs=(()=>{ try{ const v=JSON.parse(localStorage.getItem('tragos.custom')); if(Array.isArray(v)) return v.filter(c=>c&&c.id&&c.name&&Array.isArray(c.ing)); }catch(e){} return []; })();
 const saveCustoms=()=>{ try{ localStorage.setItem('tragos.custom', JSON.stringify(customs)); }catch(e){} };
-function regCustom(c){ DRINKS.push(c); byId[c.id]=c; if(ILL[c.from]) ILL[c.id]=ILL[c.from]; }
+function regCustom(c){ const b=byId[c.from]; c.of=(b&&b.of)||c.from; c.vl=c.name; DRINKS.push(c); byId[c.id]=c; if(ILL[c.from]) ILL[c.id]=ILL[c.from]; }
 customs.forEach(regCustom);
 
 /* ---- favoritos y vista (se guardan en el teléfono) ---- */
 let favs = (()=>{ try{ const v = JSON.parse(localStorage.getItem('tragos.favs')); if(Array.isArray(v)) return v.filter(id=>byId[id]); }catch(e){} return []; })();
 const saveFavs = ()=>{ try{ localStorage.setItem('tragos.favs', JSON.stringify(favs)); }catch(e){} };
-const isFav = id => favs.includes(id);
+const rootId = id => (byId[id]&&byId[id].of)||id;
+const versOf = id => [byId[id], ...DRINKS.filter(x=>x.of===id)].filter(Boolean);
+const isFav = id => favs.includes(id) || DRINKS.some(x=>x.of===id&&favs.includes(x.id));
+let verSel={}; try{ verSel=JSON.parse(localStorage.getItem('tragos.ver'))||{}; }catch(e){}
+const saveVer=()=>{ try{ localStorage.setItem('tragos.ver',JSON.stringify(verSel)); }catch(e){} };
 let view = 'cards'; try{ if(localStorage.getItem('tragos.view')==='list') view='list'; }catch(e){}
 document.body.dataset.view = view;
 
@@ -323,9 +333,10 @@ function status(d){
   return {g,ok,total:real.length,have:real.length-miss.length,miss};
 }
 const missLbl=x=>x.map(i=>LBL[i]).join(' / ');
+function bestSt(d){ let b=null; versOf(rootId(d.id)).forEach(v=>{ const s=status(v); if(!b||(s.total&&(s.have/s.total>b.have/b.total||!b.total))) b=s; }); return b; }
 function badge(d){
   if(!pantry.length) return '';
-  const s=status(d); if(!s.total) return '';
+  const s=bestSt(d); if(!s.total) return '';
   if(ps&&s.miss.length>1) return `<span class="mk-badge">${s.have}/${s.total}</span>`;
   if(!s.miss.length) return `<span class="mk-badge ok">✓ ${s.have}/${s.total}</span>`;
   if(s.miss.length===1) return `<span class="mk-badge near">${s.have}/${s.total}</span>`;
@@ -333,11 +344,11 @@ function badge(d){
 }
 let mf='fav'; try{ const v=localStorage.getItem('tragos.mf'); if(['fav','mine'].includes(v)) mf=v; }catch(e){}
 let ps=false; try{ ps=localStorage.getItem('tragos.ps')==='1'; }catch(e){}
-const pct=d=>{ const s=status(d); return s.total?s.have/s.total:0; };
+const pct=d=>{ const s=bestSt(d); return s.total?s.have/s.total:0; };
 const byPct=l=>(ps&&pantry.length)?[...l].sort((a,b)=>pct(b)-pct(a)):l;
 function canLists(){
   const ready=[],near=[];
-  DRINKS.forEach(d=>{ const s=status(d); if(!s.total) return; if(!s.miss.length) ready.push(d); else if(s.miss.length===1) near.push(d); });
+  DRINKS.filter(d=>!d.of).forEach(d=>{ const s=bestSt(d); if(!s.total) return; if(!s.miss.length) ready.push(d); else if(s.miss.length===1) near.push(d); });
   return {ready,near};
 }
 const PANBTN='<svg viewBox="0 0 24 24"><path d="M7 3h10v3H7zM6 6h12l1 4v9a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-9z"/><path d="M5.5 12h13"/></svg>';
@@ -351,9 +362,9 @@ const row  = d => `<div class="row" role="button" tabindex="0" data-id="${d.id}"
 const listHtml = list => view==='list' ? `<div class="list">${list.map(row).join('')}</div>` : `<div class="grid">${list.map(tile).join('')}</div>`;
 
 function barDrinks(id){
-  if(id==='mi') return DRINKS.filter(d=>isFav(d.id));
-  if(id==='tiki') return DRINKS.filter(d=>d.bar==='tiki');
-  return DRINKS;
+  if(id==='mi') return DRINKS.filter(d=>!d.of&&isFav(d.id));
+  if(id==='tiki') return DRINKS.filter(d=>!d.of&&d.bar==='tiki');
+  return DRINKS.filter(d=>!d.of);
 }
 function secList(parts){
   const h=parts.map(p=>typeof p==='string'?`<div class="mk-sec">${p}</div>`:(view==='list'?row(p):tile(p))).join('');
@@ -361,7 +372,7 @@ function secList(parts){
 }
 const emptyMsg=(t,m,btn)=>`<div class="empty"><b>${t}</b>${m}${btn?'<br><button class="mk-btn" data-openpantry>ARMAR MI DESPENSA</button>':''}</div>`;
 function barContent(id){
-  if(id==='mi' && mf==='mine'){ const l=DRINKS.filter(d=>d.custom); return l.length?listHtml(byPct(l)):emptyMsg('Sin recetas propias','Abrí cualquier trago y tocá “+ Mi versión” para crear la tuya.'); }
+  if(id==='mi' && mf==='mine'){ const l=DRINKS.filter(d=>d.custom&&!d.of||false).concat(DRINKS.filter(d=>d.custom&&d.of)); return l.length?listHtml(byPct(l)):emptyMsg('Sin recetas propias','Abrí cualquier trago y tocá “+ Mi versión” para crear la tuya.'); }
   const l = barDrinks(id);
   if(!l.length) return `<div class="empty"><b>Tu bar está vacío</b>Tocá el corazón de cualquier trago y queda guardado acá.<small>Deslizá para ver los otros bares →</small></div>`;
   return listHtml(byPct(l));
@@ -395,11 +406,12 @@ $('#pager').addEventListener('scroll', ()=>{ const p=$('#pager'); const i=Math.r
 $('#dots').addEventListener('click', e=>{ const b=e.target.closest('button'); if(b) goTo(+b.dataset.i); });
 
 /* ---- vista del trago ---- */
-let openId=null, porc=1;
+let openId=null, porc=1, verId=null;
+const curD=()=>byId[verId]||byId[openId];
 const fracBtns = () => PORC.map(([v,l])=>`<button data-p="${v}" class="${Math.abs(v-porc)<1e-6?'on':''}">${l}</button>`).join('');
 const ingHtml = d => { const st=pantry.length?status(d):null; return d.ing.map(([a,n],k)=>{ const o=st&&st.ok[k]; const c=o===true?' class="have"':o===false?' class="miss"':''; return `<li${c}><b>${scaleQty(a,porc)}</b><span>${n}</span>${o===true?'<i class="st">LO TENÉS</i>':o===false?'<i class="st">FALTA</i>':''}</li>`; }).join(''); };
 function paintBox(){
-  const d=byId[openId]; if(!d) return; const box=$('#pBox'), sh=$('#pShop'); if(!box) return;
+  const d=curD(); if(!d) return; const box=$('#pBox'), sh=$('#pShop'); if(!box) return;
   if(!pantry.length){ box.innerHTML=`<div class="mk-sum"><b>¿QUÉ TE FALTA?</b>Cargá tu despensa y te marco qué ingredientes tenés para este trago.<br><button data-openpantry>ARMAR MI DESPENSA</button></div>`; sh.innerHTML=''; return; }
   const s=status(d); if(!s.total){ box.innerHTML=''; sh.innerHTML=''; return; }
   const pct=Math.round(100*s.have/s.total);
@@ -424,36 +436,41 @@ function openPantry(){
 }
 
 function paintPorc(){
-  const d=byId[openId]; if(!d) return;
+  const d=curD(); if(!d) return;
   $('#porcVal').textContent = porcLabel(porc);
   $('#fracs').innerHTML = fracBtns();
   $('#ingList').innerHTML = ingHtml(d);
 }
-function openSheet(id, src){
-  const d = byId[id]; if(!d) return;
-  openId=id; porc=1;
-  const det=$('#detail');
-  det.innerHTML = `
-    <div class="dscroll" id="dscroll">
+function sheetInner(){
+  const r=byId[openId], d=curD(), vs=versOf(openId);
+  const tabs=vs.length>1?`<div class="vtabs">${vs.map(v=>`<button data-ver="${v.id}" class="${v.id===verId?'on':''}">${esc(v.vl||v.name)}</button>`).join('')}</div>`:'';
+  return `
       <div class="dhead">
-        ${pic(d,'dpic')}
+        ${pic(r,'dpic')}
         <div class="dside">
-          <div class="dtools">${favBtn(id)}<button data-close aria-label="Cerrar">×</button></div>
-          <h2 class="dname ${d.name.length>12?'long':''}">${d.name}</h2>
+          <div class="dtools">${favBtn(openId)}<button data-close aria-label="Cerrar">×</button></div>
+          <h2 class="dname ${r.name.length>12?'long':''}">${r.name}</h2>
           <div class="dchips">${d.glass} · ${d.method}${d.garnish&&d.garnish!=='—'?' · '+d.garnish:''}</div>
           <span class="lbl">PORCIONES</span>
-          <div class="stepper"><button data-s="-1" aria-label="Menos"><svg viewBox="0 0 12 12"><path d="M9 1L3 6l6 5z"/></svg></button><b id="porcVal">1</b><button data-s="1" aria-label="Más"><svg viewBox="0 0 12 12"><path d="M3 1l6 5-6 5z"/></svg></button></div>
+          <div class="stepper"><button data-s="-1" aria-label="Menos"><svg viewBox="0 0 12 12"><path d="M9 1L3 6l6 5z"/></svg></button><b id="porcVal">${porcLabel(porc)}</b><button data-s="1" aria-label="Más"><svg viewBox="0 0 12 12"><path d="M3 1l6 5-6 5z"/></svg></button></div>
           <div class="fracs" id="fracs">${fracBtns()}</div>
         </div>
       </div>
+      ${tabs}
       <div class="dact">${d.custom?'<button data-edit>Editar</button><button data-del class="danger">Borrar</button>':'<button data-newv>+ Mi versión</button>'}</div>
       <h3>Ingredientes</h3>
       <div id="pBox"></div>
       <ul class="ing" id="ingList">${ingHtml(d)}</ul>
       <div id="pShop"></div>
       <h3>Preparación</h3>
-      <ol class="steps">${d.steps.map(s=>`<li>${s}</li>`).join('')}</ol>
-    </div>
+      <ol class="steps">${d.steps.map(s=>`<li>${s}</li>`).join('')}</ol>`;
+}
+function openSheet(id, src){
+  if(!byId[id]) return;
+  const root=rootId(id); openId=root; porc=1;
+  verId = byId[id].of ? id : (verSel[root] && byId[verSel[root]] ? verSel[root] : root);
+  const det=$('#detail');
+  det.innerHTML = `<div class="dscroll" id="dscroll">${sheetInner()}</div>
     <div class="grain"></div>${frames(BARS[cur].id)}`;
   paintBar(); paintBox();
   det.classList.add('show'); det.setAttribute('aria-hidden','false');
@@ -478,7 +495,7 @@ function closeSheet(){
 /* ---- editor de versiones ---- */
 let ed=null;
 const esc = t => String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-function nextName(d){ const b=byId[d.from]||d; return `${b.name} v${customs.filter(c=>c.from===b.id).length+2}`; }
+function nextName(d){ const b=byId[rootId(d.id)]||d; return `${b.name} v${customs.filter(c=>rootId(c.id)===b.id).length+2}`; }
 function openEditor(id){
   const d=byId[id]; if(!d) return;
   ed={id, editing:!!d.custom, name:d.custom?d.name:nextName(d), ing:d.ing.map(x=>[x[0],x[1]]), steps:d.steps.slice()};
@@ -524,7 +541,7 @@ function delCustom(id){
   customs=customs.filter(c=>c.id!==id);
   const i=DRINKS.findIndex(x=>x.id===id); if(i>=0) DRINKS.splice(i,1);
   delete byId[id]; delete ILL[id]; favs=favs.filter(x=>x!==id);
-  saveCustoms(); saveFavs(); closeSheet(); render(); goTo(cur,false); runSearch();
+  delete verSel[rootId(id)]; saveVer(); saveCustoms(); saveFavs(); closeSheet(); render(); goTo(cur,false); runSearch();
 }
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeSheet(); if((e.key==='Enter'||e.key===' ') && (e.target.classList?.contains('tile')||e.target.classList?.contains('row'))){ e.preventDefault(); openSheet(e.target.dataset.id, e.target);} });
 
@@ -537,10 +554,12 @@ document.addEventListener('click', e=>{
   if(pi){ const i=pi.dataset.pi; pantry=pantry.includes(i)?pantry.filter(x=>x!==i):[...pantry,i]; shop=shop.filter(x=>x!==i); savePantry(); pdirty=true; $('#pBody').innerHTML=pantryBody(); return; }
   const bg=e.target.closest('[data-bought]');
   if(bg){ const i=bg.dataset.bought; shop=shop.filter(x=>x!==i); if(!pantry.includes(i)) pantry.push(i); savePantry(); pdirty=true; $('#pBody').innerHTML=pantryBody(); return; }
-  if(e.target.closest('[data-addshop]')){ const d=byId[openId]; if(d){ status(d).miss.forEach(x=>{ if(!x.some(i=>shop.includes(i))) shop.push(x[0]); }); savePantry(); paintBox(); } return; }
+  const vt=e.target.closest('[data-ver]');
+  if(vt){ verId=vt.dataset.ver; verSel[openId]=verId; saveVer(); const sc=$('#dscroll'), y=sc.scrollTop; sc.innerHTML=sheetInner(); paintBox(); sc.scrollTop=y; return; }
+  if(e.target.closest('[data-addshop]')){ const d=curD(); if(d){ status(d).miss.forEach(x=>{ if(!x.some(i=>shop.includes(i))) shop.push(x[0]); }); savePantry(); paintBox(); } return; }
   if(e.target.closest('[data-close]')){ closeSheet(); return; }
-  if(e.target.closest('[data-newv],[data-edit]')){ openEditor(openId); return; }
-  if(e.target.closest('[data-del]')){ delCustom(openId); return; }
+  if(e.target.closest('[data-newv],[data-edit]')){ openEditor(verId); return; }
+  if(e.target.closest('[data-del]')){ delCustom(verId); return; }
   if(e.target.closest('[data-edcancel]')){ const id=ed&&ed.id; ed=null; openSheet(id); return; }
   if(e.target.closest('[data-edsave]')){ saveEd(); return; }
   if(e.target.closest('[data-adding]')){ syncEd(); ed.ing.push(['','']); paintEditor(); const q=document.querySelectorAll('#edIng .irow'); q[q.length-1].querySelector('input').focus(); return; }
@@ -559,7 +578,7 @@ document.addEventListener('click', e=>{
   if(f){
     e.stopPropagation();
     const id = f.dataset.fav;
-    favs = isFav(id) ? favs.filter(x=>x!==id) : [...favs, id];
+    favs = isFav(id) ? favs.filter(x=>x!==id&&(byId[x]||{}).of!==id) : [...favs, id];
     saveFavs();
     render(); goTo(cur,false);
     const rs=$('#results'), rsc=rs.querySelector('.inner')?.scrollTop||0; runSearch(); const inn=rs.querySelector('.inner'); if(inn) inn.scrollTop=rsc;
@@ -586,8 +605,8 @@ function runSearch(){
   const box = $('#results');
   if(!raw){ box.classList.remove('show'); box.innerHTML=''; return; }
   const terms = norm(raw).split(/\s+/).filter(Boolean);
-  const hits = DRINKS.filter(d=>{
-    const words = norm([d.name, d.tags, d.glass, d.method, d.garnish, ...d.ing.map(i=>i[1])].join(' ')).split(/[^a-z0-9]+/);
+  const hits = DRINKS.filter(d=>!d.of).filter(d=>{
+    const words = norm(versOf(d.id).map(x=>[x.name, x.vl, x.tags, x.glass, x.method, x.garnish, ...x.ing.map(i=>i[1])].join(' ')).join(' ')).split(/[^a-z0-9]+/);
     return terms.every(t=>words.some(w=>w.startsWith(t)));
   });
   const wasShown = box.classList.contains('show');
