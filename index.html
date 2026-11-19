@@ -185,6 +185,14 @@ body.clasico-d .dscroll h3{color:#F0B046}
 .mk-sum.cp{margin:2px 0 4px;padding:7px 12px;font-size:12.5px;border-radius:14px;line-height:1.35}
 .mk-sum.cp b{display:inline;font-size:12px;margin:0 6px 0 0}
 .mk-sum.cp button{margin:0 0 0 6px;height:24px;padding:0 10px;font-size:10px}
+.mk-sum.cp.tg{padding:0}
+.ptog{display:flex;align-items:center;justify-content:space-between;width:100%;height:34px;padding:0 12px;border:0;background:transparent;color:var(--fg);cursor:pointer}
+.mk-sum.cp .ptog{border:0!important;margin:0!important;height:34px;padding:0 12px;border-radius:14px;letter-spacing:0}
+.ptog b{margin:0!important}
+.ptog svg{width:12px;height:12px;fill:none;stroke:var(--fg);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+.tg.open .ptog svg{transform:rotate(180deg)}
+.pbody{padding:0 12px 10px;font-size:13px;line-height:1.4}
+.pbody .mk-btn{margin-top:8px;height:28px;font-size:10.5px}
 </style>
 </head>
 <body data-view="cards" data-bar="mi">
@@ -421,15 +429,20 @@ $('#dots').addEventListener('click', e=>{ const b=e.target.closest('button'); if
 let openId=null, porc=1, verId=null;
 const curD=()=>byId[verId]||byId[openId];
 const fracBtns = () => PORC.map(([v,l])=>`<button data-p="${v}" class="${Math.abs(v-porc)<1e-6?'on':''}">${l}</button>`).join('');
-const ingHtml = d => { const st=pantry.length?status(d):null; return d.ing.map(([a,n],k)=>{ const o=st&&st.ok[k]; const c=o===true?' class="have"':o===false?' class="miss"':''; return `<li${c}><b>${scaleQty(a,porc)}</b><span>${n}</span>${o===true?'<i class="st">LO TENÉS</i>':o===false?'<i class="st">FALTA</i>':''}</li>`; }).join(''); };
+const ingHtml = d => { const st=pantry.length?status(d):null; return d.ing.map(([a,n],k)=>{ const o=st&&st.ok[k]; const c=o===true?' class="have"':o===false?' class="miss"':''; return `<li${c}><b>${scaleQty(a,porc)}</b><span>${n}</span></li>`; }).join(''); };
+let pOpen=false;
 function paintBox(){
   const d=curD(); if(!d) return; const box=$('#pBox'), sh=$('#pShop'); if(!box) return;
-  if(!pantry.length){ box.innerHTML=`<div class="mk-sum cp">¿Qué te falta? <button data-openpantry>ARMAR MI DESPENSA</button></div>`; sh.innerHTML=''; return; }
-  const s=status(d); if(!s.total){ box.innerHTML=''; sh.innerHTML=''; return; }
+  sh.innerHTML='';
+  if(!pantry.length){ box.innerHTML=`<div class="mk-sum cp">¿Qué te falta? <button data-openpantry>ARMAR MI DESPENSA</button></div>`; return; }
+  const s=status(d); if(!s.total){ box.innerHTML=''; return; }
   const pct=Math.round(100*s.have/s.total);
-  box.innerHTML=`<div class="mk-sum cp"><b>TENÉS ${s.have} DE ${s.total} · ${pct}%</b>${s.miss.length?'Te falta: '+s.miss.map(missLbl).join(', ').toLowerCase()+'.':'¡Tenés todo!'}</div>`;
-  const pend=s.miss.filter(x=>!shop.includes(x[0]));
-  sh.innerHTML=!s.miss.length?'':pend.length?`<button class="mk-btn" data-addshop>+ AGREGAR A LA LISTA DE COMPRAS</button>`:`<button class="mk-btn" data-openpantry>✓ EN TU LISTA · VER</button>`;
+  let body='';
+  if(pOpen){
+    const pend=s.miss.filter(x=>!shop.includes(x[0]));
+    body=`<div class="pbody">${s.miss.length?'Te falta: '+s.miss.map(missLbl).join(', ').toLowerCase()+'.':'¡Tenés todo para prepararlo!'}${s.miss.length?(pend.length?`<br><button class="mk-btn" data-addshop>+ AGREGAR A LA LISTA DE COMPRAS</button>`:`<br><button class="mk-btn" data-openpantry>✓ EN TU LISTA · VER</button>`):''}</div>`;
+  }
+  box.innerHTML=`<div class="mk-sum cp tg ${pOpen?'open':''}"><button class="ptog" data-ptoggle aria-expanded="${pOpen}"><b>TENÉS ${s.have} DE ${s.total} · ${pct}%</b><svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4"/></svg></button>${body}</div>`;
 }
 /* ---- pantalla de despensa ---- */
 function pantryBody(){
@@ -476,7 +489,7 @@ function sheetInner(){
 }
 function openSheet(id, src){
   if(!byId[id]) return;
-  const root=rootId(id); openId=root; porc=1;
+  const root=rootId(id); openId=root; porc=1; pOpen=false;
   verId = byId[id].of ? id : (verSel[root] && byId[verSel[root]] ? verSel[root] : root);
   const det=$('#detail');
   det.innerHTML = `<div class="dscroll" id="dscroll">${sheetInner()}</div>
@@ -563,6 +576,7 @@ document.addEventListener('click', e=>{
   if(pi){ const i=pi.dataset.pi; pantry=pantry.includes(i)?pantry.filter(x=>x!==i):[...pantry,i]; shop=shop.filter(x=>x!==i); savePantry(); pdirty=true; $('#pBody').innerHTML=pantryBody(); return; }
   const bg=e.target.closest('[data-bought]');
   if(bg){ const i=bg.dataset.bought; shop=shop.filter(x=>x!==i); if(!pantry.includes(i)) pantry.push(i); savePantry(); pdirty=true; $('#pBody').innerHTML=pantryBody(); return; }
+  if(e.target.closest('[data-ptoggle]')){ pOpen=!pOpen; paintBox(); return; }
   const vt=e.target.closest('[data-ver]');
   if(vt){ verId=vt.dataset.ver; verSel[openId]=verId; saveVer(); const sc=$('#dscroll'), y=sc.scrollTop; sc.innerHTML=sheetInner(); paintBox(); sc.scrollTop=y; return; }
   if(e.target.closest('[data-addshop]')){ const d=curD(); if(d){ status(d).miss.forEach(x=>{ if(!x.some(i=>shop.includes(i))) shop.push(x[0]); }); savePantry(); paintBox(); } return; }
