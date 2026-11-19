@@ -125,7 +125,7 @@ body.clasico-d .dscroll h3{color:#F0B046}
 [data-bar="clasico"] .dscroll h3{color:#F0B046}
 .ing{list-style:none;margin:0;padding:0}
 .ing li{display:flex;gap:12px;padding:8px 0;border-bottom:1.5px dashed rgba(var(--fgrgb),.28);font-size:15.5px}
-.ing li b{flex:none;min-width:84px;font-weight:700}
+.ing li b{flex:none;min-width:66px;font-weight:700}
 .steps{margin:0;padding-left:0;list-style:none;font-size:15.5px;line-height:1.42;counter-reset:s}
 .steps li{position:relative;margin:0 0 12px;padding-left:28px;counter-increment:s}
 .steps li::before{content:counter(s);position:absolute;left:0;top:0;font-family:var(--ruina);color:var(--accent)}
@@ -173,6 +173,18 @@ body.clasico-d .dscroll h3{color:#F0B046}
 .vtabs{display:flex;gap:6px;margin-top:16px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.vtabs::-webkit-scrollbar{display:none}
 .vtabs button{flex:none;height:30px;padding:0 13px;border:1.8px solid rgba(var(--fgrgb),.5);border-radius:999px;background:transparent;color:var(--fg);font-family:var(--ruina);font-size:11px;letter-spacing:.6px;text-transform:uppercase;cursor:pointer}
 .vtabs button.on{background:var(--fg);color:var(--bgc);border-color:var(--fg)}
+.dpic{width:108px!important;height:124px!important}.dpic.flat{width:100px!important;height:100px!important}
+.dscroll{padding-top:calc(var(--dtop) - 6px)!important}
+.dname{margin-top:4px!important}.dchips{margin-top:6px!important}
+.stepper{margin-top:10px}
+.vtabs{margin-top:8px!important;align-items:center}
+.vtabs .vplus{width:30px;padding:0;font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;border-style:dashed}
+.dact{margin-top:8px!important}.dact button{height:30px;font-size:11px}
+.dscroll h3{margin:14px 0 4px!important}
+.ing li{padding:6px 0!important}
+.mk-sum.cp{margin:2px 0 4px;padding:7px 12px;font-size:12.5px;border-radius:14px;line-height:1.35}
+.mk-sum.cp b{display:inline;font-size:12px;margin:0 6px 0 0}
+.mk-sum.cp button{margin:0 0 0 6px;height:24px;padding:0 10px;font-size:10px}
 </style>
 </head>
 <body data-view="cards" data-bar="mi">
@@ -412,10 +424,10 @@ const fracBtns = () => PORC.map(([v,l])=>`<button data-p="${v}" class="${Math.ab
 const ingHtml = d => { const st=pantry.length?status(d):null; return d.ing.map(([a,n],k)=>{ const o=st&&st.ok[k]; const c=o===true?' class="have"':o===false?' class="miss"':''; return `<li${c}><b>${scaleQty(a,porc)}</b><span>${n}</span>${o===true?'<i class="st">LO TENÉS</i>':o===false?'<i class="st">FALTA</i>':''}</li>`; }).join(''); };
 function paintBox(){
   const d=curD(); if(!d) return; const box=$('#pBox'), sh=$('#pShop'); if(!box) return;
-  if(!pantry.length){ box.innerHTML=`<div class="mk-sum"><b>¿QUÉ TE FALTA?</b>Cargá tu despensa y te marco qué ingredientes tenés para este trago.<br><button data-openpantry>ARMAR MI DESPENSA</button></div>`; sh.innerHTML=''; return; }
+  if(!pantry.length){ box.innerHTML=`<div class="mk-sum cp">¿Qué te falta? <button data-openpantry>ARMAR MI DESPENSA</button></div>`; sh.innerHTML=''; return; }
   const s=status(d); if(!s.total){ box.innerHTML=''; sh.innerHTML=''; return; }
   const pct=Math.round(100*s.have/s.total);
-  box.innerHTML=`<div class="mk-sum"><b>TENÉS ${s.have} DE ${s.total} · ${pct}%</b>${s.miss.length?'Te falta: '+s.miss.map(missLbl).join(', ').toLowerCase()+'.':'¡Tenés todo para prepararlo!'}</div>`;
+  box.innerHTML=`<div class="mk-sum cp"><b>TENÉS ${s.have} DE ${s.total} · ${pct}%</b>${s.miss.length?'Te falta: '+s.miss.map(missLbl).join(', ').toLowerCase()+'.':'¡Tenés todo!'}</div>`;
   const pend=s.miss.filter(x=>!shop.includes(x[0]));
   sh.innerHTML=!s.miss.length?'':pend.length?`<button class="mk-btn" data-addshop>+ AGREGAR A LA LISTA DE COMPRAS</button>`:`<button class="mk-btn" data-openpantry>✓ EN TU LISTA · VER</button>`;
 }
@@ -438,12 +450,11 @@ function openPantry(){
 function paintPorc(){
   const d=curD(); if(!d) return;
   $('#porcVal').textContent = porcLabel(porc);
-  $('#fracs').innerHTML = fracBtns();
   $('#ingList').innerHTML = ingHtml(d);
 }
 function sheetInner(){
   const r=byId[openId], d=curD(), vs=versOf(openId);
-  const tabs=vs.length>1?`<div class="vtabs">${vs.map(v=>`<button data-ver="${v.id}" class="${v.id===verId?'on':''}">${esc(v.vl||v.name)}</button>`).join('')}</div>`:'';
+  const tabs=`<div class="vtabs">${vs.map(v=>`<button data-ver="${v.id}" class="${v.id===verId?'on':''}">${esc(v.vl||(v.id===openId?'Original':v.name))}</button>`).join('')}<button class="vplus" data-newv aria-label="Agregar mi versión">+</button></div>`;
   return `
       <div class="dhead">
         ${pic(r,'dpic')}
@@ -451,13 +462,11 @@ function sheetInner(){
           <div class="dtools">${favBtn(openId)}<button data-close aria-label="Cerrar">×</button></div>
           <h2 class="dname ${r.name.length>12?'long':''}">${r.name}</h2>
           <div class="dchips">${d.glass} · ${d.method}${d.garnish&&d.garnish!=='—'?' · '+d.garnish:''}</div>
-          <span class="lbl">PORCIONES</span>
           <div class="stepper"><button data-s="-1" aria-label="Menos"><svg viewBox="0 0 12 12"><path d="M9 1L3 6l6 5z"/></svg></button><b id="porcVal">${porcLabel(porc)}</b><button data-s="1" aria-label="Más"><svg viewBox="0 0 12 12"><path d="M3 1l6 5-6 5z"/></svg></button></div>
-          <div class="fracs" id="fracs">${fracBtns()}</div>
         </div>
       </div>
       ${tabs}
-      <div class="dact">${d.custom?'<button data-edit>Editar</button><button data-del class="danger">Borrar</button>':'<button data-newv>+ Mi versión</button>'}</div>
+      ${d.custom?'<div class="dact"><button data-edit>Editar</button><button data-del class="danger">Borrar</button></div>':''}
       <h3>Ingredientes</h3>
       <div id="pBox"></div>
       <ul class="ing" id="ingList">${ingHtml(d)}</ul>
@@ -496,9 +505,9 @@ function closeSheet(){
 let ed=null;
 const esc = t => String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 function nextName(d){ const b=byId[rootId(d.id)]||d; return `${b.name} v${customs.filter(c=>rootId(c.id)===b.id).length+2}`; }
-function openEditor(id){
+function openEditor(id,fresh){
   const d=byId[id]; if(!d) return;
-  ed={id, editing:!!d.custom, name:d.custom?d.name:nextName(d), ing:d.ing.map(x=>[x[0],x[1]]), steps:d.steps.slice()};
+  ed={id, editing:!!d.custom&&!fresh, name:(d.custom&&!fresh)?d.name:nextName(d), ing:d.ing.map(x=>[x[0],x[1]]), steps:d.steps.slice()};
   paintEditor();
 }
 function paintEditor(){
@@ -558,7 +567,8 @@ document.addEventListener('click', e=>{
   if(vt){ verId=vt.dataset.ver; verSel[openId]=verId; saveVer(); const sc=$('#dscroll'), y=sc.scrollTop; sc.innerHTML=sheetInner(); paintBox(); sc.scrollTop=y; return; }
   if(e.target.closest('[data-addshop]')){ const d=curD(); if(d){ status(d).miss.forEach(x=>{ if(!x.some(i=>shop.includes(i))) shop.push(x[0]); }); savePantry(); paintBox(); } return; }
   if(e.target.closest('[data-close]')){ closeSheet(); return; }
-  if(e.target.closest('[data-newv],[data-edit]')){ openEditor(verId); return; }
+  if(e.target.closest('[data-newv]')){ openEditor(verId,true); return; }
+  if(e.target.closest('[data-edit]')){ openEditor(verId); return; }
   if(e.target.closest('[data-del]')){ delCustom(verId); return; }
   if(e.target.closest('[data-edcancel]')){ const id=ed&&ed.id; ed=null; openSheet(id); return; }
   if(e.target.closest('[data-edsave]')){ saveEd(); return; }
