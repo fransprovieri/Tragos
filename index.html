@@ -205,10 +205,44 @@ const NAVICO = {
   clasico:'<svg viewBox="0 0 24 24"><path d="M4 5h16l-8 9.5z"/><path d="M12 14.5V20M8 20h8"/></svg>'
 };
 /* ilustraciones propias (el resto usa el ícono plano de siempre) */
-const ALLILL = ['old-fashioned','mai-tai','pina-colada','painkiller','jungle-bird','daiquiri','negroni','margarita','martini','manhattan','mojito','aperol-spritz','whiskey-sour','espresso-martini','fernet-coca','cynar-pomelo','gancia-sprite'];
+const ALLILL = ['old-fashioned','mai-tai','pina-colada','painkiller','jungle-bird','daiquiri','negroni','margarita','martini','manhattan','mojito','aperol-spritz','whiskey-sour','espresso-martini','fernet-coca','cynar-pomelo','gancia-sprite','zombie','navy-grog','jet-pilot','three-dots'];
 const ILL = {}; ALLILL.forEach(i=>ILL[i]=`assets/drinks/${i}.webp`);
 const $ = s => document.querySelector(s);
 const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+
+/* ---- más tragos tiki y versiones (recetas armadas con medidas habituales, a gusto) ---- */
+const V=(id,name,glass,method,garnish,tags,ing,steps,ill)=>({id,name,bar:'tiki',glass,method,garnish,tags,ing,steps,ill});
+const MORE=[
+ V('mai-tai-vic','Mai Tai · Trader Vic 1944','Vaso old fashioned','Shaker','Menta y cáscara de lima',
+  'mai tai trader vic original ron añejo curacao orgeat lima menta tiki clasico version',
+  [['60 ml','Ron añejo jamaiquino'],['15 ml','Curaçao de naranja'],['8 ml','Orgeat'],['8 ml','Jarabe simple'],['30 ml','Jugo de lima'],['—','Hielo picado']],
+  ['Shakeá todo con hielo.','Colá sobre hielo picado en el vaso.','Decorá con la cáscara de lima exprimida y una rama de menta.'],'mai-tai'),
+ V('mai-tai-2','Mai Tai · dos rones','Vaso old fashioned','Shaker','Menta y lima',
+  'mai tai dos rones jamaiquino agricole curacao orgeat lima menta tiki moderno version',
+  [['30 ml','Ron jamaiquino'],['30 ml','Ron agricole'],['15 ml','Curaçao de naranja'],['15 ml','Orgeat'],['30 ml','Jugo de lima'],['—','Hielo picado']],
+  ['Shakeá todo con hielo.','Colá sobre hielo picado.','Decorá con menta y media lima exprimida.'],'mai-tai'),
+ V('zombie','Zombie','Vaso alto','Shaker','Menta, lima y cereza',
+  'zombie tiki ron blanco ron oscuro overproof lima pomelo granadina canela angostura donn beach',
+  [['45 ml','Ron blanco'],['45 ml','Ron oscuro'],['30 ml','Ron overproof'],['30 ml','Jugo de lima'],['15 ml','Jugo de pomelo'],['15 ml','Jarabe de canela'],['10 ml','Granadina'],['2 dashes','Angostura'],['—','Hielo picado']],
+  ['Shakeá todo con hielo.','Colá sobre hielo picado en un vaso alto.','Decorá con menta, lima y cereza.','Ojo: lleva tres rones, tomalo con calma.'],'zombie'),
+ V('zombie-donn','Zombie · Donn Beach 1934','Vaso alto','Shaker','Menta y lima',
+  'zombie donn beach 1934 original ron jamaiquino dorado demerara 151 lima pomelo canela falernum pernod angostura',
+  [['45 ml','Ron jamaiquino dorado'],['45 ml','Ron dorado de Puerto Rico'],['30 ml','Ron demerara 151'],['22 ml','Jugo de lima'],['15 ml','Jugo de pomelo'],['8 ml','Jarabe de canela'],['15 ml','Falernum'],['1 dash','Angostura'],['6 gotas','Pernod'],['5 ml','Granadina']],
+  ['Shakeá todo con hielo picado (poco tiempo).','Serví todo, con el hielo, en un vaso alto.','Decorá con una rama de menta.'],'zombie'),
+ V('navy-grog','Navy Grog','Vaso old fashioned','Shaker','Lima y menta',
+  'navy grog tiki ron oscuro ron blanco demerara lima pomelo miel soda hielo picado donn beach',
+  [['30 ml','Ron oscuro'],['30 ml','Ron demerara'],['30 ml','Ron blanco'],['22 ml','Jugo de lima'],['22 ml','Jugo de pomelo'],['22 ml','Jarabe de miel'],['30 ml','Soda'],['—','Hielo picado']],
+  ['Shakeá todo, menos la soda, con hielo.','Colá sobre hielo picado.','Completá con la soda.','Decorá con lima y menta.'],'navy-grog'),
+ V('jet-pilot','Jet Pilot','Vaso old fashioned','Shaker','Lima flameada y canela',
+  'jet pilot tiki ron jamaiquino dorado overproof lima pomelo canela falernum angostura pernod flameado',
+  [['30 ml','Ron jamaiquino'],['22 ml','Ron dorado'],['22 ml','Ron overproof'],['22 ml','Jugo de lima'],['15 ml','Jugo de pomelo'],['15 ml','Jarabe de canela'],['15 ml','Falernum'],['1 dash','Angostura'],['—','Hielo picado']],
+  ['Shakeá todo con hielo.','Colá sobre hielo picado.','Decorá con un palo de canela y una cáscara de lima.','Si querés flamearla, hacelo con cuidado y lejos de todo lo que se queme.'],'jet-pilot'),
+ V('three-dots','Three Dots and a Dash','Vaso alto','Shaker','Tres cerezas y ananá',
+  'three dots and a dash tiki ron agricole demerara lima naranja miel falernum angostura cerezas',
+  [['45 ml','Ron agricole'],['15 ml','Ron demerara'],['15 ml','Jugo de lima'],['15 ml','Jugo de naranja'],['8 ml','Jarabe de miel'],['8 ml','Falernum'],['1 dash','Angostura'],['—','Hielo picado']],
+  ['Shakeá todo con hielo.','Colá sobre hielo picado en un vaso alto.','Pinchá tres cerezas y un trozo de ananá y apoyalos arriba.'],'three-dots')
+];
+MORE.forEach(m=>{ const {ill,...d}=m; DRINKS.push(d); ILL[d.id]=ILL[ill]; });
 const byId = Object.fromEntries(DRINKS.map(d => [d.id, d]));
 const HEART = '<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
 
