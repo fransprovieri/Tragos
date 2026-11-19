@@ -1,4 +1,4 @@
-const C='tragos-v25';
+const C='tragos-v26';
 const FILES=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-180.png','./assets/Ruina.ttf',
  ...['mi','tiki','clasico'].flatMap(b=>[0,1,2,3].map(f=>`./assets/marco/${b}_${f}.webp`)),
  ...['old-fashioned','mai-tai','pina-colada','painkiller','jungle-bird','daiquiri','negroni','margarita','martini','manhattan','mojito','aperol-spritz','whiskey-sour','espresso-martini','fernet-coca','cynar-pomelo','gancia-sprite'].map(d=>`./assets/drinks/${d}.webp`)];
