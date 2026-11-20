@@ -228,7 +228,7 @@ const NAVICO = {
   clasico:'<svg viewBox="0 0 24 24"><path d="M4 5h16l-8 9.5z"/><path d="M12 14.5V20M8 20h8"/></svg>'
 };
 /* ilustraciones propias (el resto usa el ícono plano de siempre) */
-const ALLILL = ['old-fashioned','mai-tai','pina-colada','painkiller','jungle-bird','daiquiri','negroni','margarita','martini','manhattan','mojito','aperol-spritz','whiskey-sour','espresso-martini','fernet-coca','cynar-pomelo','gancia-sprite','zombie','navy-grog','jet-pilot','three-dots'];
+const ALLILL = ['old-fashioned','mai-tai','pina-colada','painkiller','jungle-bird','daiquiri','negroni','margarita','martini','manhattan','mojito','aperol-spritz','whiskey-sour','espresso-martini','fernet-coca','cynar-pomelo','gancia-sprite','zombie','navy-grog','jet-pilot','three-dots','fog-cutter','planters-punch','test-pilot','hurricane','scorpion','saturn'];
 const ILL = {}; ALLILL.forEach(i=>ILL[i]=`assets/drinks/${i}.webp`);
 const $ = s => document.querySelector(s);
 const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
@@ -263,7 +263,31 @@ const MORE=[
  V('three-dots','Three Dots and a Dash','Vaso alto','Shaker','Tres cerezas y ananá',
   'three dots and a dash tiki ron agricole demerara lima naranja miel falernum angostura cerezas',
   [['45 ml','Ron agricole'],['15 ml','Ron demerara'],['15 ml','Jugo de lima'],['15 ml','Jugo de naranja'],['8 ml','Jarabe de miel'],['8 ml','Falernum'],['1 dash','Angostura'],['—','Hielo picado']],
-  ['Shakeá todo con hielo.','Colá sobre hielo picado en un vaso alto.','Pinchá tres cerezas y un trozo de ananá y apoyalos arriba.'],'three-dots')
+  ['Shakeá todo con hielo.','Colá sobre hielo picado en un vaso alto.','Pinchá tres cerezas y un trozo de ananá y apoyalos arriba.'],'three-dots'),
+ V('fog-cutter','Fog Cutter','Vaso alto','Shaker','Menta y rodaja de naranja',
+  'fog cutter trader vic tiki ron blanco brandy cognac gin naranja limon orgeat jerez sherry',
+  [['60 ml','Ron blanco'],['30 ml','Brandy o coñac'],['15 ml','Gin'],['60 ml','Jugo de naranja'],['30 ml','Jugo de limón'],['15 ml','Orgeat'],['15 ml','Jerez dulce (para flotar)'],['—','Hielo picado']],
+  ['Shakeá todo, menos el jerez, con hielo.','Colá sobre hielo picado en un vaso alto.','Flotá el jerez arriba con una cuchara.','Decorá con menta y una rodaja de naranja.'],'fog-cutter'),
+ V('planters-punch','Planter\'s Punch','Vaso alto','Shaker','Naranja, cereza y menta',
+  'planters punch tiki clasico ron jamaiquino oscuro lima demerara granadina angostura soda',
+  [['60 ml','Ron jamaiquino oscuro'],['30 ml','Jugo de lima'],['22 ml','Jarabe demerara'],['8 ml','Granadina'],['2 dashes','Angostura'],['30 ml','Soda'],['—','Hielo picado']],
+  ['Shakeá todo, menos la soda, con hielo.','Colá sobre hielo picado en un vaso alto.','Completá con la soda.','Decorá con rodaja de naranja, cereza y menta.'],'planters-punch'),
+ V('test-pilot','Test Pilot','Vaso old fashioned','Licuadora','Cereza',
+  'test pilot donn beach tiki ron jamaiquino ron blanco lima falernum cointreau angostura pernod licuado',
+  [['45 ml','Ron jamaiquino oscuro'],['22 ml','Ron blanco'],['15 ml','Jugo de lima'],['15 ml','Falernum'],['15 ml','Cointreau'],['1 dash','Angostura'],['6 gotas','Pernod (o absenta)'],['—','Hielo picado']],
+  ['Licuá todo con un puñado de hielo picado, 5 segundos.','Serví en el vaso, con más hielo si hace falta.','Decorá con una cereza en un palillo.'],'test-pilot'),
+ V('hurricane','Hurricane','Copa hurricane','Shaker','Naranja y cereza',
+  'hurricane new orleans pat obriens tiki ron oscuro maracuya limon granadina',
+  [['60 ml','Ron oscuro'],['30 ml','Jarabe de maracuyá'],['30 ml','Jugo de limón'],['30 ml','Jugo de naranja'],['8 ml','Granadina'],['—','Hielo']],
+  ['Shakeá todo con hielo.','Colá sobre hielo en la copa.','Decorá con rodaja de naranja y cereza.'],'hurricane'),
+ V('scorpion','Scorpion','Bowl','Shaker','Flor y menta',
+  'scorpion trader vic tiki bowl ron blanco brandy cognac naranja limon orgeat para compartir',
+  [['45 ml','Ron blanco'],['30 ml','Brandy o coñac'],['60 ml','Jugo de naranja'],['30 ml','Jugo de limón'],['15 ml','Orgeat'],['—','Hielo picado']],
+  ['Shakeá todo con hielo.','Colá sobre hielo picado en un bowl.','Decorá con una flor y menta; multiplicá las porciones para compartir.'],'scorpion'),
+ V('saturn','Saturn','Copa','Licuadora','Anillo de cáscara de limón y cereza',
+  'saturn tiki gin maracuya limon falernum orgeat licuado jose popo galsini',
+  [['45 ml','Gin'],['15 ml','Jugo de limón'],['15 ml','Jarabe de maracuyá'],['8 ml','Falernum'],['8 ml','Orgeat'],['—','Hielo picado']],
+  ['Licuá todo con un poco de hielo picado, unos segundos.','Serví en la copa.','Decorá con una cereza dentro de un anillo de cáscara de limón.'],'saturn')
 ];
 MORE.forEach(m=>{ const {ill,...d}=m; DRINKS.push(d); ILL[d.id]=ILL[ill]; });
 /* versiones: un solo trago con varias recetas adentro (of = trago principal, vl = nombre corto de la pestaña) */
@@ -322,10 +346,10 @@ const nmCls = d => d.name.length>12 ? 'nm long' : 'nm';
 
 /* ---- despensa: ingredientes canónicos y cálculo de "qué puedo hacer" ---- */
 const CAT=[
- ['Alcohol',[['gin','Gin'],['ron-blanco','Ron blanco'],['ron-oscuro','Ron oscuro'],['whisky','Whisky / bourbon'],['tequila','Tequila'],['vodka','Vodka'],['fernet','Fernet'],['campari','Campari'],['aperol','Aperol'],['cynar','Cynar'],['gancia','Gancia'],['prosecco','Prosecco']]],
- ['Vermut y licores',[['vermut-rojo','Vermut rojo'],['vermut-seco','Vermut seco'],['licor-naranja','Licor de naranja'],['licor-cafe','Licor de café'],['orgeat','Orgeat'],['angostura','Angostura']]],
+ ['Alcohol',[['gin','Gin'],['ron-blanco','Ron blanco'],['ron-oscuro','Ron oscuro'],['whisky','Whisky / bourbon'],['tequila','Tequila'],['brandy','Brandy / coñac'],['vodka','Vodka'],['fernet','Fernet'],['campari','Campari'],['aperol','Aperol'],['cynar','Cynar'],['gancia','Gancia'],['prosecco','Prosecco']]],
+ ['Vermut y licores',[['vermut-rojo','Vermut rojo'],['vermut-seco','Vermut seco'],['licor-naranja','Licor de naranja'],['licor-cafe','Licor de café'],['orgeat','Orgeat'],['falernum','Falernum'],['jerez','Jerez'],['angostura','Angostura']]],
  ['Jugos y frescos',[['lima','Lima'],['limon','Limón'],['anana','Ananá'],['naranja','Naranja'],['pomelo','Pomelo'],['menta','Menta'],['cafe','Café (espresso)']]],
- ['Gaseosas y otros',[['soda','Soda'],['coca','Coca-Cola'],['sprite','Sprite'],['tonica','Tónica'],['jarabe','Jarabe / azúcar'],['crema-coco','Crema de coco']]]
+ ['Gaseosas y otros',[['soda','Soda'],['coca','Coca-Cola'],['sprite','Sprite'],['tonica','Tónica'],['jarabe','Jarabe / azúcar'],['maracuya','Jarabe de maracuyá'],['granadina','Granadina'],['crema-coco','Crema de coco']]]
 ];
 const LBL={}; CAT.forEach(c=>c[1].forEach(([i,l])=>LBL[i]=l));
 const IGN=[/twist de \w+/,/rodaja de \w+/,/cascara de \w+/,/hielo( \w+)?/,/\bagua\b/,/\bsal\b/,/aceitunas?/,/cerezas?/,/granos? de cafe/,/nuez moscada/,/clara de huevo/,/opcional/];
@@ -333,7 +357,7 @@ const RULES=[[/licor de cafe|kahlua/,['licor-cafe']],[/curacao( de naranja)?|lic
  [/ron blanco|ron claro/,['ron-blanco']],[/ron (oscuro|negro)/,['ron-oscuro']],[/\bron\b/,['ron-blanco','ron-oscuro']],
  [/bourbon|\brye\b|whisk?e?y|scotch/,['whisky']],[/\bgin\b|ginebra/,['gin']],[/tequila/,['tequila']],[/vodka/,['vodka']],[/fernet/,['fernet']],
  [/campari/,['campari']],[/aperol/,['aperol']],[/cynar/,['cynar']],[/gancia/,['gancia']],[/prosecco|espumante/,['prosecco']],
- [/vermut (seco|dry)/,['vermut-seco']],[/vermut/,['vermut-rojo']],[/orgeat/,['orgeat']],[/angostura/,['angostura']],
+ [/vermut (seco|dry)/,['vermut-seco']],[/vermut/,['vermut-rojo']],[/orgeat/,['orgeat']],[/falernum/,['falernum']],[/jerez|sherry/,['jerez']],[/brandy|conac|cognac/,['brandy']],[/maracuya/,['maracuya']],[/granadina/,['granadina']],[/angostura/,['angostura']],
  [/tonica/,['tonica']],[/crema de coco/,['crema-coco']],[/coca/,['coca']],[/sprite/,['sprite']],[/soda/,['soda']],[/menta/,['menta']],
  [/\blima\b/,['lima']],[/limon/,['limon']],[/anana/,['anana']],[/naranja/,['naranja']],[/pomelo/,['pomelo']],
  [/espresso|cafe/,['cafe']],[/jarabe|azucar/,['jarabe']]];
