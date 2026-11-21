@@ -193,11 +193,13 @@ body.clasico-d .dscroll h3{color:#F0B046}
 .tg.open .ptog svg{transform:rotate(180deg)}
 .pbody{padding:0 12px 10px;font-size:13px;line-height:1.4}
 .pbody .mk-btn{margin-top:8px;height:28px;font-size:10.5px}
-.unitbtn{display:inline-flex;margin-left:8px;height:32px;border:1.8px solid rgba(var(--fgrgb),.75);border-radius:999px;padding:2px;background:transparent;cursor:pointer;vertical-align:top;margin-top:10px}
-.unitbtn span{display:flex;align-items:center;padding:0 9px;border-radius:999px;font:700 13px/1 inherit;color:var(--fg);font-family:inherit}
+.unitbtn{display:inline-flex;margin:0;height:32px;flex:none;border:1.8px solid rgba(var(--fgrgb),.75);border-radius:999px;padding:2px;background:transparent;cursor:pointer;vertical-align:top}
+.unitbtn span{display:flex;align-items:center;padding:0 7px;border-radius:999px;font:700 13px/1 inherit;color:var(--fg);font-family:inherit}
 .unitbtn span.on{background:var(--fg);color:var(--bgc)}
 .row{content-visibility:auto;contain-intrinsic-size:auto 66px}
 .tile{content-visibility:auto;contain-intrinsic-size:auto 170px}
+.prow{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:nowrap}
+.prow .stepper{margin-top:0;width:96px;flex:none}
 </style>
 </head>
 <body data-view="cards" data-bar="mi">
@@ -487,7 +489,7 @@ function sheetInner(){
           <div class="dtools">${favBtn(openId)}<button data-close aria-label="Cerrar">×</button></div>
           <h2 class="dname ${r.name.length>12?'long':''}">${r.name}</h2>
           <div class="dchips">${d.glass} · ${d.method}${d.garnish&&d.garnish!=='—'?' · '+d.garnish:''}</div>
-          <div class="stepper"><button data-s="-1" aria-label="Menos"><svg viewBox="0 0 12 12"><path d="M9 1L3 6l6 5z"/></svg></button><b id="porcVal">${porcLabel(porc)}</b><button data-s="1" aria-label="Más"><svg viewBox="0 0 12 12"><path d="M3 1l6 5-6 5z"/></svg></button></div><button class="unitbtn" data-unit aria-label="Cambiar unidades"><span class="${unit==='ml'?'on':''}">ml</span><span class="${unit==='oz'?'on':''}">oz</span></button>
+          <div class="prow"><div class="stepper"><button data-s="-1" aria-label="Menos"><svg viewBox="0 0 12 12"><path d="M9 1L3 6l6 5z"/></svg></button><b id="porcVal">${porcLabel(porc)}</b><button data-s="1" aria-label="Más"><svg viewBox="0 0 12 12"><path d="M3 1l6 5-6 5z"/></svg></button></div><button class="unitbtn" data-unit aria-label="Cambiar unidades"><span class="${unit==='ml'?'on':''}">ml</span><span class="${unit==='oz'?'on':''}">oz</span></button></div>
         </div>
       </div>
       ${tabs}
