@@ -153,7 +153,7 @@ body.clasico-d .dscroll h3{color:#F0B046}
 .mk-badge{position:absolute;top:2px;left:6px;height:22px;padding:0 9px;border-radius:999px;font-family:var(--ruina);font-size:11px;letter-spacing:.6px;display:flex;align-items:center;gap:4px;color:#fff;z-index:3}
 .mk-badge:not(.ok):not(.near){background:rgba(var(--fgrgb),.6)}
 .mk-chips button[data-ps].on:before{content:"↓ ";margin-right:4px}
-.mk-badge.ok{background:#3E9A4A}.mk-badge.near{background:#D58A1C}
+.mk-badge.ok{background:#3E9A4A}.mk-badge.sub{background:#8E9A6E}.mk-badge.near{background:#D58A1C}
 .row .mk-badge{position:static;display:inline-flex;height:17px;padding:0 7px;font-size:10px;margin-left:8px;vertical-align:2px}
 .mk-sec{grid-column:1/-1;font-family:var(--ruina);font-size:12px;letter-spacing:1px;color:var(--accent);margin:2px 0 -6px}
 .list .mk-sec{margin:14px 0 4px}.list .mk-sec:first-child{margin-top:0}
@@ -166,7 +166,7 @@ body.clasico-d .dscroll h3{color:#F0B046}
 .mk-sum{margin:16px 0 10px;padding:12px 14px;border:1.8px dashed rgba(var(--fgrgb),.45);border-radius:16px;font-size:14px;line-height:1.4}
 .mk-sum b{font-family:var(--ruina);font-weight:400;letter-spacing:.8px;font-size:13px;display:block;margin-bottom:3px}
 .mk-sum button{margin-top:8px;height:30px;padding:0 14px;border:1.8px solid rgba(var(--fgrgb),.75);border-radius:999px;background:transparent;color:var(--fg);font-family:var(--ruina);font-size:11px;letter-spacing:.8px;cursor:pointer}
-.ing li.miss span,.ing li.miss b{opacity:.5}.ing li.miss span{text-decoration:line-through}
+.ing li.miss span,.ing li.miss b{opacity:.5}.ing li.sub span,.ing li.sub b{opacity:.75}.subw{display:block;font-size:12.5px;font-style:italic;opacity:.8;color:var(--fg)}.ing li.miss span{text-decoration:line-through}
 .ing li .st{margin-left:auto;font-style:normal;font-size:11px;font-family:var(--ruina);letter-spacing:.6px;align-self:center;white-space:nowrap}
 .ing li.have .st{color:#3E9A4A}.ing li.miss .st{color:#C4472A}
 .mk-btn{margin-top:14px;height:34px;padding:0 16px;border:1.8px solid rgba(var(--fgrgb),.75);border-radius:999px;display:inline-flex;align-items:center;background:transparent;color:var(--fg);font-family:var(--ruina);font-size:12px;letter-spacing:.8px;cursor:pointer}
@@ -200,6 +200,10 @@ body.clasico-d .dscroll h3{color:#F0B046}
 .tile{content-visibility:auto;contain-intrinsic-size:auto 170px}
 .prow{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:nowrap}
 .prow .stepper{margin-top:0;width:96px;flex:none}
+.mk-pan h3 .pcat{all:unset;display:flex;align-items:center;gap:8px;width:100%;cursor:pointer;font:inherit;color:inherit;letter-spacing:inherit}
+.pcat i{font-style:normal;font-family:var(--ruina);font-size:11px;background:var(--fg);color:var(--bgc);border-radius:999px;padding:2px 8px;letter-spacing:.5px}
+.pcat svg{width:13px;height:13px;margin-left:auto;fill:none;stroke:currentColor;stroke-width:2;transform:rotate(-90deg);transition:transform .2s}
+.pcat.open svg{transform:none}
 </style>
 </head>
 <body data-view="cards" data-bar="mi">
@@ -336,12 +340,13 @@ const CAT=[
  ['Alcohol',[['gin','Gin'],['ron-blanco','Ron blanco'],['ron-anejo','Ron añejo / dorado'],['ron-oscuro','Ron oscuro / negro'],['ron-jamaica','Ron jamaiquino'],['ron-demerara','Ron demerara'],['ron-overproof','Ron overproof / 151'],['ron-agricole','Rhum agricole'],['whisky','Whisky / bourbon'],['tequila','Tequila'],['brandy','Brandy / coñac'],['pisco','Pisco'],['cachaca','Cachaça'],['vodka','Vodka'],['fernet','Fernet'],['campari','Campari'],['aperol','Aperol'],['cynar','Cynar'],['gancia','Gancia'],['prosecco','Prosecco']]],
  ['Vermut y licores',[['vermut-rojo','Vermut rojo'],['vermut-seco','Vermut seco'],['licor-naranja','Licor de naranja'],['licor-cafe','Licor de café'],['orgeat','Orgeat'],['falernum','Falernum'],['allspice','Allspice dram'],['anis','Pernod / absenta'],['marrasquino','Licor marrasquino'],['damasco','Licor de damasco'],['durazno','Licor de durazno'],['cereza','Cherry Heering / licor de cereza'],['banana','Licor de banana'],['benedictine','Bénédictine'],['chartreuse','Chartreuse'],['sauco','Licor de saúco'],['violeta','Crème de violette'],['amaro','Amaro'],['lillet','Lillet blanc'],['vino-blanco','Vino blanco'],['jerez','Jerez'],['angostura','Angostura'],['peychaud',"Peychaud's"],['bitters-esp','Bitters tiki / especiales'],['licor43','Licor 43'],['pera','Licor de pera'],['hibisco','Licor de hibisco'],['oporto','Oporto / Madeira'],['drambuie','Drambuie'],['frutos-rojos','Licor de mora / cassis / frambuesa'],['cacao','Crème de cacao'],['galliano','Galliano'],['licor-jengibre','Licor de jengibre'],['licor-miel','Licor de miel'],['arrack','Arrack / aquavit']]],
  ['Jugos y frescos',[['lima','Lima'],['limon','Limón'],['anana','Ananá'],['naranja','Naranja'],['pomelo','Pomelo'],['arandanos','Jugo de arándanos'],['tomate','Jugo de tomate'],['menta','Menta'],['cafe','Café (espresso)'],['papaya','Néctar de papaya'],['nectar-damasco','Néctar de damasco'],['mango','Néctar de mango'],['nectar-durazno','Néctar de durazno'],['uva','Jugo de uva'],['agua-coco','Agua de coco'],['leche-coco','Leche de coco'],['lychee','Lychees'],['frutas','Fruta fresca (durazno, frutillas…)']]],
- ['Gaseosas y otros',[['soda','Soda'],['coca','Coca-Cola'],['sprite','Sprite'],['tonica','Tónica'],['jarabe','Jarabe / azúcar'],['maracuya','Jarabe de maracuyá'],['granadina','Granadina'],['miel','Miel'],['ginger','Ginger beer / ginger ale'],['crema-coco','Crema de coco'],['sweet-sour','Sweet & sour'],['guayaba','Gaseosa de guayaba'],['te','Té']]],
- ['Heladera y especias',[['huevo','Huevos'],['crema','Crema de leche'],['leche','Leche'],['leche-condensada','Leche condensada'],['manteca','Manteca'],['nuez-moscada','Nuez moscada'],['canela','Canela'],['clavo','Clavo de olor'],['vainilla','Extracto de vainilla'],['almendra','Extracto de almendra'],['worcestershire','Salsa Worcestershire'],['tabasco','Tabasco']]]
+ ['Gaseosas y otros',[['soda','Soda'],['coca','Coca-Cola'],['sprite','Sprite'],['tonica','Tónica'],['ginger','Ginger beer / ginger ale'],['crema-coco','Crema de coco'],['sweet-sour','Sweet & sour'],['guayaba','Gaseosa de guayaba'],['te','Té']]],
+ ['Heladera y especias',[['huevo','Huevos'],['crema','Crema de leche'],['leche','Leche'],['leche-condensada','Leche condensada'],['manteca','Manteca'],['nuez-moscada','Nuez moscada'],['canela','Canela'],['clavo','Clavo de olor'],['vainilla','Extracto de vainilla'],['almendra','Extracto de almendra'],['worcestershire','Salsa Worcestershire'],['tabasco','Tabasco']]],
+ ['Jarabes',[['jarabe','Jarabe simple / azúcar'],['jarabe-demerara','Jarabe demerara / azúcar mascabo'],['miel','Miel'],['jarabe-canela','Jarabe de canela'],['jarabe-vainilla','Jarabe de vainilla'],['jarabe-arce','Jarabe de arce'],['jarabe-agave','Jarabe de agave'],['jarabe-jengibre','Jarabe de jengibre'],['jarabe-frambuesa','Jarabe de frambuesa'],['maracuya','Jarabe de maracuyá'],['granadina','Granadina']]]
 ];
 const LBL={}; CAT.forEach(c=>c[1].forEach(([i,l])=>LBL[i]=l));
 const IGN=[/twist de \w+/,/rodaja de \w+/,/cascara de \w+/,/hielo( \w+)?/,/\bagua\b(?! de coco)/,/\bsal\b/,/aceitunas?/,/(?<!licor de )cerezas?/,/granos? de cafe/,/opcional/];
-const RULES=[[/peychaud/,['peychaud']],[/bitter tiki|elemakule|burlesque|chocolate mole/,['bitters-esp']],[/licor 43/,['licor43']],[/licor de pera/,['pera']],[/hibisco/,['hibisco']],[/oporto|madeira/,['oporto']],[/drambuie/,['drambuie']],[/licor de mora|cassis|licor de frambuesa/,['frutos-rojos']],[/creme de cacao/,['cacao']],[/galliano/,['galliano']],[/licor de jengibre/,['licor-jengibre']],[/barenjager|licor de miel/,['licor-miel']],[/arrack|aquavit/,['arrack']],[/punt e mes/,['vermut-rojo']],[/grand marnier/,['licor-naranja']],[/nectar de papaya/,['papaya']],[/nectar de damasco/,['nectar-damasco']],[/nectar de mango/,['mango']],[/nectar de durazno/,['nectar-durazno']],[/jugo de uva/,['uva']],[/agua de coco/,['agua-coco']],[/leche de coco/,['leche-coco']],[/lychee/,['lychee']],[/durazno fresco|frutas picadas/,['frutas']],[/sweet/,['sweet-sour']],[/guayaba/,['guayaba']],[/\bte\b|chai/,['te']],[/\bhuevo\b/,['huevo']],[/crema (de leche|liviana|dulce)|^\s*crema\s*$/,['crema']],[/leche condensada/,['leche-condensada']],[/leche entera/,['leche']],[/manteca/,['manteca']],[/nuez moscada/,['nuez-moscada']],[/canela molida|rama de canela/,['canela']],[/clavo/,['clavo']],[/extracto de vainilla/,['vainilla']],[/extracto de almendra/,['almendra']],[/worcestershire/,['worcestershire']],[/tabasco/,['tabasco']],[/licor de cafe|kahlua/,['licor-cafe']],[/curacao( de naranja)?|licor de naranja|cointreau|triple sec/,['licor-naranja']],
+const RULES=[[/jarabe de miel y jengibre|jarabe de jengibre/,['jarabe-jengibre']],[/jarabe de miel|mezcla de miel/,['miel']],[/jarabe demerara|azucar mascabo|demerara simple/,['jarabe-demerara']],[/jarabe de canela/,['jarabe-canela']],[/jarabe de vainilla/,['jarabe-vainilla']],[/jarabe de arce/,['jarabe-arce']],[/jarabe de agave/,['jarabe-agave']],[/jarabe de frambuesa/,['jarabe-frambuesa']],[/peychaud/,['peychaud']],[/bitter tiki|elemakule|burlesque|chocolate mole/,['bitters-esp']],[/licor 43/,['licor43']],[/licor de pera/,['pera']],[/hibisco/,['hibisco']],[/oporto|madeira/,['oporto']],[/drambuie/,['drambuie']],[/licor de mora|cassis|licor de frambuesa/,['frutos-rojos']],[/creme de cacao/,['cacao']],[/galliano/,['galliano']],[/licor de jengibre/,['licor-jengibre']],[/barenjager|licor de miel/,['licor-miel']],[/arrack|aquavit/,['arrack']],[/punt e mes/,['vermut-rojo']],[/grand marnier/,['licor-naranja']],[/nectar de papaya/,['papaya']],[/nectar de damasco/,['nectar-damasco']],[/nectar de mango/,['mango']],[/nectar de durazno/,['nectar-durazno']],[/jugo de uva/,['uva']],[/agua de coco/,['agua-coco']],[/leche de coco/,['leche-coco']],[/lychee/,['lychee']],[/durazno fresco|frutas picadas/,['frutas']],[/sweet/,['sweet-sour']],[/guayaba/,['guayaba']],[/\bte\b|chai/,['te']],[/\bhuevo\b/,['huevo']],[/crema (de leche|liviana|dulce)|^\s*crema\s*$/,['crema']],[/leche condensada/,['leche-condensada']],[/leche entera/,['leche']],[/manteca/,['manteca']],[/nuez moscada/,['nuez-moscada']],[/canela molida|rama de canela/,['canela']],[/clavo/,['clavo']],[/extracto de vainilla/,['vainilla']],[/extracto de almendra/,['almendra']],[/worcestershire/,['worcestershire']],[/tabasco/,['tabasco']],[/licor de cafe|kahlua/,['licor-cafe']],[/curacao( de naranja)?|licor de naranja|cointreau|triple sec/,['licor-naranja']],
  [/allspice|pimienta de jamaica/,['allspice']],[/overproof|\b151\b/,['ron-overproof']],[/barbancourt/,['ron-anejo']],[/agricole|\brhum\b|martinica/,['ron-agricole']],[/\bron\b[^,]*(negro|oscuro)[^,]*(jamaica|jamaiquino)|\bron\b[^,]*(jamaica|jamaiquino)[^,]*(negro|oscuro)/,['ron-oscuro','ron-jamaica']],[/\bron\b[^,]*(jamaica|jamaiquino|myers|appleton)/,['ron-jamaica']],[/\bron\b[^,]*(demerara|guyana)/,['ron-demerara']],[/\bron\b[^,]*(negro|oscuro)|pusser/,['ron-oscuro']],[/\bron\b[^,]*ligeramente/,['ron-blanco','ron-anejo']],[/\bron\b[^,]*(blanco|claro|sin anejar)/,['ron-blanco']],[/\bron\b[^,]*(anej|dorado|columna|barbados|seale|coffey)/,['ron-anejo']],[/\bron\b/,['ron-blanco','ron-anejo','ron-oscuro']],
  [/bourbon|\brye\b|whisk?e?y|scotch/,['whisky']],[/\bgin\b|ginebra/,['gin']],[/tequila/,['tequila']],[/vodka/,['vodka']],[/fernet/,['fernet']],
  [/campari/,['campari']],[/aperol/,['aperol']],[/cynar/,['cynar']],[/gancia/,['gancia']],[/prosecco|espumante/,['prosecco']],
@@ -362,23 +367,39 @@ let pantry=ls('tragos.pantry'), shop=ls('tragos.shop');
 const savePantry=()=>{ try{ localStorage.setItem('tragos.pantry',JSON.stringify(pantry)); localStorage.setItem('tragos.shop',JSON.stringify(shop)); }catch(e){} };
 function status(d){
   const g=d.ing.map(i=>ingIds(i[1])), real=g.filter(Boolean);
-  const ok=g.map(x=>x?x.some(i=>pantry.includes(i)):null);
-  const miss=real.filter((x,k)=>!x.some(i=>pantry.includes(i)));
-  return {g,ok,total:real.length,have:real.length-miss.length,miss};
+  const subs=[];
+  const ok=g.map(x=>{ if(!x) return null; if(x.some(i=>pantry.includes(i))) return true; const s=subFor(x); if(s){ subs.push([x,s]); return 'sub'; } return false; });
+  const miss=g.filter((x,k)=>x&&ok[k]===false);
+  return {g,ok,total:real.length,have:real.length-miss.length-subs.length,miss,subs,sub:subs.map(z=>z[1])};
 }
+/* reemplazos: si no tenés el ingrediente pero sí uno de estos, se puede hacer, aunque no quede igual */
+const SUB={'vermut-seco':['lillet','vermut-rojo'],'vermut-rojo':['vermut-seco'],'lillet':['vermut-seco'],
+ 'ron-blanco':['ron-agricole','ron-anejo','cachaca'],'ron-anejo':['ron-oscuro','ron-jamaica','ron-demerara','ron-blanco'],'ron-oscuro':['ron-jamaica','ron-demerara','ron-anejo'],
+ 'ron-jamaica':['ron-oscuro','ron-demerara','ron-anejo'],'ron-demerara':['ron-oscuro','ron-jamaica','ron-anejo'],'ron-overproof':['ron-oscuro','ron-jamaica','ron-demerara','ron-anejo'],
+ 'ron-agricole':['ron-blanco','cachaca','ron-anejo'],'cachaca':['ron-agricole','ron-blanco'],'pisco':['cachaca'],'brandy':['whisky'],'whisky':['brandy'],
+ 'lima':['limon'],'limon':['lima'],'prosecco':['vino-blanco'],'tonica':['soda'],'sprite':['soda'],'ginger':['licor-jengibre'],
+ 'jarabe':['jarabe-demerara','miel','jarabe-agave'],'jarabe-demerara':['jarabe','jarabe-arce'],'miel':['jarabe','jarabe-agave'],'jarabe-canela':['jarabe','jarabe-demerara'],
+ 'jarabe-vainilla':['jarabe'],'jarabe-arce':['jarabe-demerara','miel','jarabe'],'jarabe-agave':['jarabe','miel'],'jarabe-jengibre':['miel','jarabe'],
+ 'jarabe-frambuesa':['granadina','frutos-rojos'],'granadina':['jarabe-frambuesa'],'damasco':['durazno'],'durazno':['damasco'],
+ 'nectar-damasco':['nectar-durazno','mango'],'nectar-durazno':['nectar-damasco','mango'],'papaya':['mango','nectar-durazno'],'mango':['papaya','nectar-durazno'],
+ 'crema-coco':['leche-coco'],'leche-coco':['crema-coco'],'crema':['leche'],'leche':['crema'],'peychaud':['angostura'],'bitters-esp':['angostura'],
+ 'licor-miel':['miel'],'licor43':['jarabe-vainilla'],'pera':['durazno','damasco'],'cereza':['marrasquino']};
+const subFor=x=>{ for(const i of x){ for(const s of (SUB[i]||[])) if(pantry.includes(s)) return s; } return null; };
 const missLbl=x=>x.map(i=>LBL[i]).join(' / ');
-function bestSt(d){ let b=null; versOf(rootId(d.id)).forEach(v=>{ const s=status(v); if(!b||(s.total&&(s.have/s.total>b.have/b.total||!b.total))) b=s; }); return b; }
+const score=s=>s.total?(s.have+.6*s.subs.length)/s.total:0;
+function bestSt(d){ let b=null; versOf(rootId(d.id)).forEach(v=>{ const s=status(v); if(!b||score(s)>score(b)||(!b.total&&s.total)) b=s; }); return b; }
 function badge(d){
   if(!pantry.length) return '';
   const s=bestSt(d); if(!s.total) return '';
-  if(ps&&s.miss.length>1) return `<span class="mk-badge">${s.have}/${s.total}</span>`;
-  if(!s.miss.length) return `<span class="mk-badge ok">✓ ${s.have}/${s.total}</span>`;
-  if(s.miss.length===1) return `<span class="mk-badge near">${s.have}/${s.total}</span>`;
+  const n=s.have+s.subs.length;
+  if(ps&&s.miss.length>1) return `<span class="mk-badge">${n}/${s.total}</span>`;
+  if(!s.miss.length) return s.subs.length?`<span class="mk-badge sub">≈ ${n}/${s.total}</span>`:`<span class="mk-badge ok">✓ ${n}/${s.total}</span>`;
+  if(s.miss.length===1) return `<span class="mk-badge near">${n}/${s.total}</span>`;
   return '';
 }
 let mf='fav'; try{ const v=localStorage.getItem('tragos.mf'); if(['fav','mine'].includes(v)) mf=v; }catch(e){}
 let ps=false; try{ ps=localStorage.getItem('tragos.ps')==='1'; }catch(e){}
-const pct=d=>{ const s=bestSt(d); return s.total?s.have/s.total:0; };
+const pct=d=>score(bestSt(d));
 const byPct=l=>(ps&&pantry.length)?[...l].sort((a,b)=>pct(b)-pct(a)):l;
 function canLists(){
   const ready=[],near=[];
@@ -444,30 +465,32 @@ $('#dots').addEventListener('click', e=>{ const b=e.target.closest('button'); if
 let openId=null, porc=1, verId=null;
 const curD=()=>byId[verId]||byId[openId];
 const fracBtns = () => PORC.map(([v,l])=>`<button data-p="${v}" class="${Math.abs(v-porc)<1e-6?'on':''}">${l}</button>`).join('');
-const ingHtml = d => { const st=pantry.length?status(d):null; return d.ing.map(([a,n],k)=>{ const o=st&&st.ok[k]; const c=o===true?' class="have"':o===false?' class="miss"':''; return `<li${c}><b>${qty(a,porc)}</b><span>${n}</span></li>`; }).join(''); };
+const ingHtml = d => { const st=pantry.length?status(d):null; return d.ing.map(([a,n],k)=>{ const o=st&&st.ok[k]; const c=o===true?' class="have"':o===false?' class="miss"':o==='sub'?' class="sub"':''; const sw=o==='sub'?st.subs.find(z=>z[0]===st.g[k]):null; return `<li${c}><b>${qty(a,porc)}</b><span>${n}${sw?`<em class="subw">con ${LBL[sw[1]].toLowerCase()}</em>`:''}</span></li>`; }).join(''); };
 let pOpen=false;
 function paintBox(){
   const d=curD(); if(!d) return; const box=$('#pBox'), sh=$('#pShop'); if(!box) return;
   sh.innerHTML='';
   if(!pantry.length){ box.innerHTML=`<div class="mk-sum cp">¿Qué te falta? <button data-openpantry>ARMAR MI DESPENSA</button></div>`; return; }
   const s=status(d); if(!s.total){ box.innerHTML=''; return; }
-  const pct=Math.round(100*s.have/s.total);
+  const pct=Math.round(100*score(s));
   let body='';
   if(pOpen){
     const pend=s.miss.filter(x=>!shop.includes(x[0]));
-    body=`<div class="pbody">${s.miss.length?'Te falta: '+s.miss.map(missLbl).join(', ').toLowerCase()+'.':'¡Tenés todo para prepararlo!'}${s.miss.length?(pend.length?`<br><button class="mk-btn" data-addshop>+ AGREGAR A LA LISTA DE COMPRAS</button>`:`<br><button class="mk-btn" data-openpantry>✓ EN TU LISTA · VER</button>`):''}</div>`;
+    const sl=s.subs.length?`${s.miss.length?'<br>':''}Lo reemplazás: ${s.subs.map(z=>missLbl(z[0]).toLowerCase()+' → '+LBL[z[1]].toLowerCase()).join(', ')}. Se puede hacer, pero no queda igual.`:'';
+    body=`<div class="pbody">${s.miss.length?'Te falta: '+s.miss.map(missLbl).join(', ').toLowerCase()+'.':(s.subs.length?'':'¡Tenés todo para prepararlo!')}${sl}${s.miss.length?(pend.length?`<br><button class="mk-btn" data-addshop>+ AGREGAR A LA LISTA DE COMPRAS</button>`:`<br><button class="mk-btn" data-openpantry>✓ EN TU LISTA · VER</button>`):''}</div>`;
   }
-  box.innerHTML=`<div class="mk-sum cp tg ${pOpen?'open':''}"><button class="ptog" data-ptoggle aria-expanded="${pOpen}"><b>TENÉS ${s.have} DE ${s.total} · ${pct}%</b><svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4"/></svg></button>${body}</div>`;
+  box.innerHTML=`<div class="mk-sum cp tg ${pOpen?'open':''}"><button class="ptog" data-ptoggle aria-expanded="${pOpen}"><b>TENÉS ${s.have} DE ${s.total}${s.subs.length?` + ${s.subs.length} REEMPLAZO${s.subs.length>1?'S':''}`:''} · ${pct}%</b><svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4"/></svg></button>${body}</div>`;
 }
 /* ---- pantalla de despensa ---- */
 function pantryBody(){
   const {ready,near}=canLists();
   const sum=pantry.length?`<b>${pantry.length} ${pantry.length===1?'INGREDIENTE':'INGREDIENTES'}</b>Podés preparar ${ready.length} ${ready.length===1?'trago':'tragos'}${near.length?` y estás a 1 ingrediente de otros ${near.length}`:''}.`:`<b>TU DESPENSA</b>Tocá lo que tenés en casa. Se guarda solo.`;
-  const cats=CAT.map(([n,l])=>`<h3>${n}</h3><div class="cl">${l.map(([i,t])=>`<button data-pi="${i}" class="${pantry.includes(i)?'on':''}">${t}</button>`).join('')}</div>`).join('');
+  const cats=CAT.map(([n,l])=>{ const c=pcol.includes(n), k=l.filter(([i])=>pantry.includes(i)).length; return `<h3><button class="pcat ${c?'':'open'}" data-pcat="${n}">${n}${k?`<i>${k}</i>`:''}<svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4"/></svg></button></h3>`+(c?'':`<div class="cl">${l.map(([i,t])=>`<button data-pi="${i}" class="${pantry.includes(i)?'on':''}">${t}</button>`).join('')}</div>`); }).join('');
   const sp=shop.length?`<h3>Para comprar</h3><div class="cl">${shop.map(i=>`<button class="shop" data-bought="${i}">${LBL[i]}</button>`).join('')}</div><div class="empty" style="padding:8px 0;text-align:left"><small>Tocá uno cuando lo compres y pasa a tu despensa.</small></div>`:'';
   return `<div class="mk-sum">${sum}</div>${sp}${cats}`;
 }
 let pdirty=false;
+let pcol=[]; try{ const v=JSON.parse(localStorage.getItem('tragos.pcol')); if(Array.isArray(v)) pcol=v; }catch(e){}
 function openPantry(){
   const det=$('#detail'); openId=null;
   det.innerHTML=`<div class="dscroll mk-pan"><div class="dhead"><div class="dside"><div class="dtools"><button data-close aria-label="Cerrar">×</button></div><h2 class="dname" style="margin-top:0">Mi despensa</h2><div class="dchips">Tocá lo que tenés en casa. Se guarda solo.</div></div></div><div id="pBody">${pantryBody()}</div></div><div class="grain"></div>${frames(BARS[cur].id)}`;
@@ -587,6 +610,8 @@ document.addEventListener('click', e=>{
   const mfb=e.target.closest('[data-mf]');
   if(mfb){ mf=mfb.dataset.mf; try{ localStorage.setItem('tragos.mf',mf); }catch(e){} render(); goTo(cur,false); return; }
   if(e.target.closest('[data-openpantry]')){ openPantry(); return; }
+  const pc=e.target.closest('[data-pcat]');
+  if(pc){ const n=pc.dataset.pcat; pcol=pcol.includes(n)?pcol.filter(x=>x!==n):[...pcol,n]; try{ localStorage.setItem('tragos.pcol',JSON.stringify(pcol)); }catch(_){} $('#pBody').innerHTML=pantryBody(); return; }
   const pi=e.target.closest('[data-pi]');
   if(pi){ const i=pi.dataset.pi; pantry=pantry.includes(i)?pantry.filter(x=>x!==i):[...pantry,i]; shop=shop.filter(x=>x!==i); savePantry(); pdirty=true; $('#pBody').innerHTML=pantryBody(); return; }
   const bg=e.target.closest('[data-bought]');
