@@ -113,7 +113,7 @@ body[data-f="0"] .frame[data-k="0"],body[data-f="1"] .frame[data-k="1"],body[dat
 .dname.long{font-size:21px;line-height:1.05}
 .dchips{margin-top:8px;font-size:12px;color:rgba(var(--fgrgb),.75);line-height:1.35}
 .lbl{display:block;margin:14px 0 6px;font-family:var(--ruina);font-size:11px;letter-spacing:.8px}
-.stepper{display:flex;align-items:center;justify-content:space-between;width:112px;height:32px;border:1.8px solid rgba(var(--fgrgb),.75);border-radius:999px;padding:0 4px}
+.stepper{display:inline-flex;align-items:center;justify-content:space-between;width:112px;height:32px;border:1.8px solid rgba(var(--fgrgb),.75);border-radius:999px;padding:0 4px}
 .stepper button{width:26px;height:26px;border:0;background:transparent;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .stepper button svg{width:12px;height:12px;fill:var(--fg)}
 .stepper b{font-size:19px;font-weight:700}
@@ -193,6 +193,9 @@ body.clasico-d .dscroll h3{color:#F0B046}
 .tg.open .ptog svg{transform:rotate(180deg)}
 .pbody{padding:0 12px 10px;font-size:13px;line-height:1.4}
 .pbody .mk-btn{margin-top:8px;height:28px;font-size:10.5px}
+.unitbtn{display:inline-flex;margin-left:8px;height:32px;border:1.8px solid rgba(var(--fgrgb),.75);border-radius:999px;padding:2px;background:transparent;cursor:pointer;vertical-align:top;margin-top:10px}
+.unitbtn span{display:flex;align-items:center;padding:0 9px;border-radius:999px;font:700 13px/1 inherit;color:var(--fg);font-family:inherit}
+.unitbtn span.on{background:var(--fg);color:var(--bgc)}
 </style>
 </head>
 <body data-view="cards" data-bar="mi">
@@ -300,6 +303,22 @@ function scaleQty(q,p){
   const metric=/^(ml|cl|g|gr)\b/i.test(rest);
   const f=metric?mlStr:fracStr;
   return f(a)+(b!==null?'–'+f(b):'')+(rest?' '+rest:'');
+}
+
+/* ---- unidades: ml u onzas (se guarda en el teléfono) ---- */
+let unit='ml'; try{ if(localStorage.getItem('tragos.unit')==='oz') unit='oz'; }catch(e){}
+const OZG=[[0,''],[.125,'⅛'],[.25,'¼'],[.375,'⅜'],[.5,'½'],[.625,'⅝'],[.75,'¾'],[.875,'⅞'],[1,'']];
+function ozStr(ml){
+  let v=ml/30; const step=v<1?.125:.25; v=Math.max(step,Math.round(v/step)*step);
+  const w=Math.floor(v+1e-6), r=v-w; const g=OZG.find(x=>Math.abs(x[0]-r)<1e-6)||[0,''];
+  return (w?String(w):'')+g[1];
+}
+function qty(q,p){
+  const s=scaleQty(q,p); if(unit!=='oz') return s;
+  const m=s.match(/^(\d+(?:[.,]\d+)?)(?:\s*[–-]\s*(\d+(?:[.,]\d+)?))?\s*ml\b(.*)$/);
+  if(!m) return s;
+  const a=parseFloat(m[1].replace(',','.')), b=m[2]?parseFloat(m[2].replace(',','.')):null;
+  return ozStr(a)+(b!==null?'–'+ozStr(b):'')+' oz'+m[3];
 }
 
 /* ---- piezas ---- */
@@ -417,7 +436,7 @@ $('#dots').addEventListener('click', e=>{ const b=e.target.closest('button'); if
 let openId=null, porc=1, verId=null;
 const curD=()=>byId[verId]||byId[openId];
 const fracBtns = () => PORC.map(([v,l])=>`<button data-p="${v}" class="${Math.abs(v-porc)<1e-6?'on':''}">${l}</button>`).join('');
-const ingHtml = d => { const st=pantry.length?status(d):null; return d.ing.map(([a,n],k)=>{ const o=st&&st.ok[k]; const c=o===true?' class="have"':o===false?' class="miss"':''; return `<li${c}><b>${scaleQty(a,porc)}</b><span>${n}</span></li>`; }).join(''); };
+const ingHtml = d => { const st=pantry.length?status(d):null; return d.ing.map(([a,n],k)=>{ const o=st&&st.ok[k]; const c=o===true?' class="have"':o===false?' class="miss"':''; return `<li${c}><b>${qty(a,porc)}</b><span>${n}</span></li>`; }).join(''); };
 let pOpen=false;
 function paintBox(){
   const d=curD(); if(!d) return; const box=$('#pBox'), sh=$('#pShop'); if(!box) return;
@@ -463,7 +482,7 @@ function sheetInner(){
           <div class="dtools">${favBtn(openId)}<button data-close aria-label="Cerrar">×</button></div>
           <h2 class="dname ${r.name.length>12?'long':''}">${r.name}</h2>
           <div class="dchips">${d.glass} · ${d.method}${d.garnish&&d.garnish!=='—'?' · '+d.garnish:''}</div>
-          <div class="stepper"><button data-s="-1" aria-label="Menos"><svg viewBox="0 0 12 12"><path d="M9 1L3 6l6 5z"/></svg></button><b id="porcVal">${porcLabel(porc)}</b><button data-s="1" aria-label="Más"><svg viewBox="0 0 12 12"><path d="M3 1l6 5-6 5z"/></svg></button></div>
+          <div class="stepper"><button data-s="-1" aria-label="Menos"><svg viewBox="0 0 12 12"><path d="M9 1L3 6l6 5z"/></svg></button><b id="porcVal">${porcLabel(porc)}</b><button data-s="1" aria-label="Más"><svg viewBox="0 0 12 12"><path d="M3 1l6 5-6 5z"/></svg></button></div><button class="unitbtn" data-unit aria-label="Cambiar unidades"><span class="${unit==='ml'?'on':''}">ml</span><span class="${unit==='oz'?'on':''}">oz</span></button>
         </div>
       </div>
       ${tabs}
@@ -577,6 +596,9 @@ document.addEventListener('click', e=>{
   if(e.target.closest('[data-adding]')){ syncEd(); ed.ing.push(['','']); paintEditor(); const q=document.querySelectorAll('#edIng .irow'); q[q.length-1].querySelector('input').focus(); return; }
   const rmb=e.target.closest('[data-rm]');
   if(rmb){ syncEd(); ed.ing.splice(+rmb.dataset.rm,1); paintEditor(); return; }
+  const ub=e.target.closest('[data-unit]');
+  if(ub){ unit=unit==='ml'?'oz':'ml'; try{ localStorage.setItem('tragos.unit',unit); }catch(_){}
+    ub.querySelectorAll('span').forEach(x=>x.classList.toggle('on',x.textContent===unit)); paintPorc(); return; }
   const s = e.target.closest('[data-s]');
   if(s){
     const i = PORC.findIndex(x=>Math.abs(x[0]-porc)<1e-6) ;
