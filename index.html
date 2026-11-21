@@ -58,7 +58,7 @@ body[data-view="cards"] .vt .a svg{fill:var(--bgc);stroke:none}body[data-view="l
 .bar{flex:0 0 100%;position:relative;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:var(--bgc);color:var(--fg)}
 .grain{position:absolute;inset:0;z-index:3;pointer-events:none;background:var(--grain)}
 .frame{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;z-index:4;opacity:0}
-body[data-f="0"] .frame[data-k="0"],body[data-f="1"] .frame[data-k="1"],body[data-f="2"] .frame[data-k="2"],body[data-f="3"] .frame[data-k="3"]{opacity:1}
+.frame[data-k="0"]{opacity:1}body.anim .frame[data-k="0"]{opacity:0}body.anim .frame.on{opacity:1}
 .scroll{position:absolute;inset:0;z-index:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:none;
   padding:calc(var(--top) + 62px) clamp(40px,11.3vw,56px) calc(100dvh - var(--fade) + 10dvh + 60px)}
 /* tapas con degradé (más livianas que una máscara): tapan la lista bajo el buscador y sobre la decoración de abajo */
@@ -196,6 +196,8 @@ body.clasico-d .dscroll h3{color:#F0B046}
 .unitbtn{display:inline-flex;margin-left:8px;height:32px;border:1.8px solid rgba(var(--fgrgb),.75);border-radius:999px;padding:2px;background:transparent;cursor:pointer;vertical-align:top;margin-top:10px}
 .unitbtn span{display:flex;align-items:center;padding:0 9px;border-radius:999px;font:700 13px/1 inherit;color:var(--fg);font-family:inherit}
 .unitbtn span.on{background:var(--fg);color:var(--bgc)}
+.row{content-visibility:auto;contain-intrinsic-size:auto 66px}
+.tile{content-visibility:auto;contain-intrinsic-size:auto 170px}
 </style>
 </head>
 <body data-view="cards" data-bar="mi">
@@ -344,7 +346,9 @@ const RULES=[[/licor de cafe|kahlua/,['licor-cafe']],[/curacao( de naranja)?|lic
  [/tonica/,['tonica']],[/crema de coco/,['crema-coco']],[/coca/,['coca']],[/sprite/,['sprite']],[/soda/,['soda']],[/menta/,['menta']],
  [/\blima\b/,['lima']],[/limon/,['limon']],[/anana/,['anana']],[/naranja/,['naranja']],[/pomelo/,['pomelo']],
  [/espresso|cafe/,['cafe']],[/jarabe|azucar/,['jarabe']]];
-function ingIds(name){
+const _ingMemo=new Map();
+function ingIds(name){ if(_ingMemo.has(name)) return _ingMemo.get(name); const r=_ingIds(name); _ingMemo.set(name,r); return r; }
+function _ingIds(name){
   let t=norm(name).replace(/\((?!o )[^)]*\)/g,' ').replace(/[()]/g,' ');
   IGN.forEach(r=>{t=t.replace(r,' ');});
   const ids=[]; let rum=false; RULES.forEach(([r,l])=>{ const isRum=l[0].startsWith('ron-'); if(isRum&&rum) return; if(r.test(t)){ if(isRum) rum=true; t=t.replace(r,' '); l.forEach(i=>{ if(!ids.includes(i)) ids.push(i); }); } });
@@ -391,7 +395,7 @@ const listHtml = list => view==='list' ? `<div class="list">${list.map(row).join
 function barDrinks(id){
   if(id==='mi') return DRINKS.filter(d=>!d.of&&isFav(d.id));
   if(id==='tiki') return DRINKS.filter(d=>!d.of&&d.bar==='tiki');
-  return DRINKS.filter(d=>!d.of);
+  return DRINKS.filter(d=>!d.of&&d.bar!=='tiki');
 }
 function secList(parts){
   const h=parts.map(p=>typeof p==='string'?`<div class="mk-sec">${p}</div>`:(view==='list'?row(p):tile(p))).join('');
@@ -416,7 +420,8 @@ function render(){
 }
 
 /* ---- marcos animados: 4 poses, ~4 cuadros por segundo (stop-motion) ---- */
-const frames = id => [0,1,2,3].map(k=>`<img class="frame" data-k="${k}" src="assets/marco/${id}_${k}.webp" alt="" decoding="async">`).join('');
+var fr = 0;
+const frames = id => [0,1,2,3].map(k=>`<img class="frame${k===fr?' on':''}" data-k="${k}" src="assets/marco/${id}_${k}.webp" alt="">`).join('');
 
 /* ---- navegación entre bares (deslizar) ---- */
 let cur = 0;
@@ -655,9 +660,18 @@ $('#q').addEventListener('input', runSearch);
 $('#q').addEventListener('keydown', e=>{ if(e.key==='Enter') e.target.blur(); });
 $('#clear').addEventListener('click', e=>{ e.preventDefault(); $('#q').value=''; runSearch(); $('#q').focus(); });
 
-let fr = 0; document.body.dataset.f = 0;
 const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-if(!reduce) setInterval(()=>{ if(document.hidden) return; fr=(fr+1)%4; document.body.dataset.f = fr; }, 250);
+function tickFrames(){ fr=(fr+1)%4; document.querySelectorAll('.frame').forEach(im=>im.classList.toggle('on',+im.dataset.k===fr)); }
+function startFrames(){
+  /* precarga y decodifica los 12 marcos antes de animar: evita que la primera vuelta se vea sin marco */
+  const urls=[]; ['mi','tiki','clasico'].forEach(b=>[0,1,2,3].forEach(k=>urls.push(`assets/marco/${b}_${k}.webp`)));
+  const keep=window.__frames=[];
+  Promise.all(urls.map(u=>{ const im=new Image(); im.src=u; keep.push(im); return (im.decode?im.decode():Promise.resolve()).catch(()=>{}); }))
+    .then(()=>Promise.all([...document.querySelectorAll('.frame')].map(im=>(im.decode?im.decode():Promise.resolve()).catch(()=>{}))))
+    .then(()=>{ document.querySelectorAll('.frame').forEach(im=>im.classList.toggle('on',+im.dataset.k===0)); document.body.classList.add('anim');
+      setInterval(()=>{ if(!document.hidden) tickFrames(); },250); });
+}
+if(!reduce) startFrames();
 paintBar();
 render();
 requestAnimationFrame(()=>goTo(cur, false));
